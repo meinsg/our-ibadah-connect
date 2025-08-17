@@ -1,8 +1,11 @@
 import { createRoot } from 'react-dom/client'
 import React from 'react'
+import { Link } from 'react-router-dom'
 import './index.css'
 
 // Temporary working version based on production site structure
+import { BrowserRouter } from 'react-router-dom'
+
 const WorkingApp = () => {
   return (
     <div className="min-h-screen bg-background">
@@ -110,9 +113,9 @@ const WorkingApp = () => {
             <h4 className="text-lg font-semibold">Ouribadah</h4>
             <p className="text-muted-foreground">Connecting Worship, Community, and Daily Life</p>
             <div className="flex justify-center space-x-6 text-sm">
-              <a href="/privacy-policy" className="text-primary hover:underline">Privacy Policy</a>
-              <a href="/terms-of-service" className="text-primary hover:underline">Terms of Service</a>
-              <a href="/contact-us" className="text-primary hover:underline">Contact Us</a>
+              <Link to="/privacy-policy" className="text-primary hover:underline">Privacy Policy</Link>
+              <Link to="/terms-of-service" className="text-primary hover:underline">Terms of Service</Link>
+              <Link to="/contact-us" className="text-primary hover:underline">Contact Us</Link>
             </div>
           </div>
         </footer>
@@ -121,4 +124,8 @@ const WorkingApp = () => {
   )
 }
 
-createRoot(document.getElementById("root")!).render(<WorkingApp />);
+createRoot(document.getElementById("root")!).render(
+  <BrowserRouter>
+    <WorkingApp />
+  </BrowserRouter>
+);
