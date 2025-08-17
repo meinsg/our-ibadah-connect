@@ -112,7 +112,22 @@ serve(async (req) => {
 
     if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
       console.error('Google Places API error:', data.status, data.error_message);
-      throw new Error(`Google Places API error: ${data.status} - ${data.error_message || 'Unknown error'}`);
+      
+      // Provide specific error messages for common issues
+      let errorMessage = `Google Places API error: ${data.status}`;
+      if (data.error_message) {
+        errorMessage += ` - ${data.error_message}`;
+      }
+      
+      if (data.status === 'REQUEST_DENIED') {
+        errorMessage += '. This usually indicates an invalid API key, billing not enabled, or API restrictions. Please check your Google Cloud Console settings.';
+      } else if (data.status === 'OVER_QUERY_LIMIT') {
+        errorMessage += '. You have exceeded your daily quota or rate limit.';
+      } else if (data.status === 'INVALID_REQUEST') {
+        errorMessage += '. The request is invalid, usually due to missing required parameters.';
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const places = (data.results || []).map(normalizePlace);
