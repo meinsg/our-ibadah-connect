@@ -6,6 +6,8 @@ import FeaturesGrid from "@/components/FeaturesGrid";
 import { Compass, Clock, MapPin, User, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import ShareButtons from "@/components/ShareButtons";
+import SocialFollow from "@/components/SocialFollow";
 import logoIcon from "@/assets/logo-icon.png";
 import backgroundPattern from "@/assets/islamic-pattern-bg.jpg";
 
@@ -97,6 +99,19 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Share Section */}
+      <section className="relative z-10 py-6">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-4">
+            <h3 className="text-lg font-semibold text-foreground mb-2 font-amiri">Share Ouribadah</h3>
+            <p className="text-sm text-muted-foreground font-inter">Help others discover our Islamic community</p>
+          </div>
+          <div className="flex justify-center">
+            <ShareButtons />
+          </div>
+        </div>
+      </section>
+
       {/* Main Features */}
       <section className="relative z-10 py-8 sm:py-12">
         <div className="container mx-auto px-4">
@@ -122,8 +137,19 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Social Follow Section */}
+      <section className="relative z-10 py-8 bg-spiritual/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-6">
+            <h3 className="text-xl font-semibold text-foreground mb-2 font-amiri">Follow Us</h3>
+            <p className="text-sm text-muted-foreground font-inter">Stay connected with the Ouribadah community</p>
+          </div>
+          <SocialFollow />
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="relative z-10 bg-primary/5 border-t border-accent mt-12 sm:mt-16 safe-area-bottom">
+      <footer className="relative z-10 bg-primary/5 border-t border-accent safe-area-bottom">
         <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
