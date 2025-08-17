@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Loader2, MapPin, Search, ArrowLeft, Navigation, ToggleLeft, ToggleRight } from "lucide-react";
+import { Loader2, MapPin, Search, ArrowLeft, Navigation, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLocation } from "@/hooks/useLocation";
 import { usePlaces } from "@/hooks/usePlaces";
@@ -163,7 +163,7 @@ const HalalFood = () => {
                   onClick={handleLocationModeToggle}
                   className="font-inter flex items-center gap-2"
                 >
-                  {locationMode === 'auto' ? <ToggleLeft className="h-4 w-4" /> : <ToggleRight className="h-4 w-4" />}
+                  <RefreshCw className="h-4 w-4" />
                   {locationMode === 'auto' ? 'Switch to Manual' : 'Switch to Auto'}
                 </Button>
               </div>
