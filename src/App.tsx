@@ -1,21 +1,27 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-// Simple test page component to avoid complex imports
-const TestPage = ({ title }: { title: string }) => (
-  <div className="p-8">
-    <h1 className="text-4xl font-bold">{title}</h1>
-    <p className="text-lg mt-4">This is a test page to verify routing works</p>
-  </div>
-);
+import { Toaster } from "@/components/ui/toaster";
+import Index from "@/pages/Index";
+import Auth from "@/pages/Auth";
+import Mosques from "@/pages/Mosques";
+import HalalFood from "@/pages/HalalFood";
+import ContactUs from "@/pages/ContactUs";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsOfService from "@/pages/TermsOfService";
+import NotFound from "@/pages/NotFound";
 
 const App = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<TestPage title="Ouribadah - Home" />} />
-      <Route path="/auth" element={<TestPage title="Auth Page" />} />
-      <Route path="/mosques" element={<TestPage title="Mosques Page" />} />
-      <Route path="*" element={<TestPage title="404 - Not Found" />} />
+      <Route path="/" element={<Index />} />
+      <Route path="/auth" element={<Auth />} />
+      <Route path="/mosques" element={<Mosques />} />
+      <Route path="/halal-food" element={<HalalFood />} />
+      <Route path="/contact" element={<ContactUs />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
+    <Toaster />
   </BrowserRouter>
 );
 
