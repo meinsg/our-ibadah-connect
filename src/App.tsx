@@ -1,25 +1,36 @@
-import * as React from 'react';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./hooks/useAuth";
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import Mosques from "./pages/Mosques";
+import HalalFood from "./pages/HalalFood";
+import NotFound from "./pages/NotFound";
 
-console.log('App.tsx React object:', React);
-console.log('App.tsx React.version:', React.version);
-console.log('App.tsx React.useState:', React.useState);
+const queryClient = new QueryClient();
 
-function App() {
-  console.log('Inside App component');
-  
-  // Test useState directly
-  const [test, setTest] = React.useState('test');
-  
-  return (
-    <div style={{ padding: '20px', fontSize: '18px' }}>
-      <h1>React Debug Test</h1>
-      <p>React Version: {React.version}</p>
-      <p>Test State: {test}</p>
-      <button onClick={() => setTest('clicked')}>
-        Test useState
-      </button>
-    </div>
-  );
-}
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/mosques" element={<Mosques />} />
+            <Route path="/halal-food" element={<HalalFood />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
 
 export default App;
