@@ -3,11 +3,15 @@ import { Card } from "@/components/ui/card";
 import PrayerTimes from "@/components/PrayerTimes";
 import QiblaDirection from "@/components/QiblaDirection";
 import FeaturesGrid from "@/components/FeaturesGrid";
-import { Compass, Clock, MapPin, Star } from "lucide-react";
+import { Compass, Clock, MapPin, User, LogOut } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import logoIcon from "@/assets/logo-icon.png";
 import backgroundPattern from "@/assets/islamic-pattern-bg.jpg";
 
 const Index = () => {
+  const { user, signOut } = useAuth();
+
   return (
     <div className="min-h-screen bg-gradient-peaceful">
       {/* Background Pattern */}
@@ -27,10 +31,26 @@ const Index = () => {
                 <p className="text-xs text-muted-foreground font-inter">Our Worship</p>
               </div>
             </div>
-            <Button variant="secondary" size="sm" className="font-inter">
-              <MapPin className="h-4 w-4 mr-2" />
-              Connect Location
-            </Button>
+            {user ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground font-inter">
+                  Welcome back!
+                </span>
+                <Button variant="secondary" size="sm" onClick={signOut} className="font-inter">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link to="/auth">
+                  <Button variant="secondary" size="sm" className="font-inter">
+                    <User className="h-4 w-4 mr-2" />
+                    Sign In
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </header>

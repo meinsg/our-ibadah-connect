@@ -1,29 +1,15 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Compass, Navigation, MapPin } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Compass, Navigation, MapPin, RefreshCw } from "lucide-react";
+import { useLocation } from "@/hooks/useLocation";
+import { useQibla } from "@/hooks/useQibla";
 
 const QiblaDirection = () => {
-  const [qiblaDirection, setQiblaDirection] = useState(45); // Mock angle
-  const [deviceHeading, setDeviceHeading] = useState(0);
-  const [location, setLocation] = useState("Getting location...");
-
-  useEffect(() => {
-    // Mock location and qibla calculation
-    setTimeout(() => {
-      setLocation("Riyadh, Saudi Arabia");
-      setQiblaDirection(245); // Mock qibla direction
-    }, 1500);
-
-    // Mock device orientation
-    const timer = setInterval(() => {
-      setDeviceHeading(prev => (prev + 1) % 360);
-    }, 100);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  const relativeQibla = (qiblaDirection - deviceHeading + 360) % 360;
+  const { location, loading: locationLoading, refetch } = useLocation();
+  const { qiblaDirection, deviceHeading, relativeQibla, loading: qiblaLoading } = useQibla(
+    location?.latitude,
+    location?.longitude
+  );
 
   return (
     <Card className="p-6 shadow-prayer bg-spiritual border-accent">
@@ -32,9 +18,27 @@ const QiblaDirection = () => {
         <h2 className="text-lg font-semibold text-foreground font-inter">Qibla Direction</h2>
       </div>
 
-      <div className="flex items-center gap-2 mb-6 text-sm text-muted-foreground">
-        <MapPin className="h-4 w-4" />
-        <span>{location}</span>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <MapPin className="h-4 w-4" />
+          <span>
+            {locationLoading 
+              ? "Getting location..." 
+              : location 
+                ? `${location.city || 'Unknown City'}, ${location.country || 'Unknown Country'}`
+                : "Location unavailable"
+            }
+          </span>
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={refetch}
+          disabled={locationLoading}
+          className="h-8 w-8 p-0"
+        >
+          <RefreshCw className={`h-4 w-4 ${locationLoading ? 'animate-spin' : ''}`} />
+        </Button>
       </div>
 
       <div className="relative">
@@ -75,7 +79,9 @@ const QiblaDirection = () => {
 
         <div className="text-center">
           <div className="bg-gradient-qibla text-white px-6 py-3 rounded-full inline-block shadow-soft">
-            <span className="font-bold text-lg font-inter">{Math.round(qiblaDirection)}°</span>
+            <span className="font-bold text-lg font-inter">
+              {qiblaLoading ? "..." : Math.round(qiblaDirection)}°
+            </span>
             <span className="text-sm ml-2 opacity-90">from North</span>
           </div>
         </div>

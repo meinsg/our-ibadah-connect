@@ -1,38 +1,30 @@
 import { Card } from "@/components/ui/card";
-import { Clock, MapPin } from "lucide-react";
+import { Clock, MapPin, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-
-interface PrayerTime {
-  name: string;
-  time: string;
-  isNext: boolean;
-}
+import { useLocation } from "@/hooks/useLocation";
+import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 
 const PrayerTimes = () => {
-  const [location, setLocation] = useState("Getting location...");
   const [currentTime, setCurrentTime] = useState(new Date());
-
-  // Mock prayer times - in real app, this would come from an API
-  const prayerTimes: PrayerTime[] = [
-    { name: "Fajr", time: "05:30", isNext: false },
-    { name: "Dhuhr", time: "12:45", isNext: true },
-    { name: "Asr", time: "16:20", isNext: false },
-    { name: "Maghrib", time: "18:45", isNext: false },
-    { name: "Isha", time: "20:15", isNext: false },
-  ];
+  const { location, loading: locationLoading, refetch: refetchLocation } = useLocation();
+  const { prayerTimes, loading: prayerLoading, nextPrayer, timeToNext, refetch: refetchPrayer } = usePrayerTimes(
+    location?.latitude,
+    location?.longitude
+  );
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
-    // Mock location update
-    setTimeout(() => {
-      setLocation("Riyadh, Saudi Arabia");
-    }, 1500);
-
     return () => clearInterval(timer);
   }, []);
+
+  const handleRefresh = () => {
+    refetchLocation();
+    refetchPrayer();
+  };
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
@@ -42,6 +34,12 @@ const PrayerTimes = () => {
     });
   };
 
+  const locationText = locationLoading 
+    ? "Getting location..." 
+    : location 
+      ? `${location.city || 'Unknown City'}, ${location.country || 'Unknown Country'}`
+      : "Location unavailable";
+
   return (
     <Card className="p-6 shadow-prayer bg-spiritual border-accent">
       <div className="flex items-center justify-between mb-6">
@@ -49,14 +47,25 @@ const PrayerTimes = () => {
           <Clock className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold text-foreground font-inter">Prayer Times</h2>
         </div>
-        <div className="text-sm text-muted-foreground">
-          {formatTime(currentTime)}
+        <div className="flex items-center gap-2">
+          <div className="text-sm text-muted-foreground">
+            {formatTime(currentTime)}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={locationLoading || prayerLoading}
+            className="h-8 w-8 p-0"
+          >
+            <RefreshCw className={`h-4 w-4 ${(locationLoading || prayerLoading) ? 'animate-spin' : ''}`} />
+          </Button>
         </div>
       </div>
 
       <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
         <MapPin className="h-4 w-4" />
-        <span>{location}</span>
+        <span>{locationText}</span>
       </div>
 
       <div className="space-y-3">
@@ -79,10 +88,10 @@ const PrayerTimes = () => {
         ))}
       </div>
 
-      {prayerTimes.some(p => p.isNext) && (
+      {nextPrayer && timeToNext && (
         <div className="mt-4 p-3 bg-gold/10 border border-gold/20 rounded-lg">
           <p className="text-center text-sm text-gold-foreground font-inter">
-            Next prayer: <span className="font-semibold">Dhuhr</span> in 2h 30m
+            Next prayer: <span className="font-semibold">{nextPrayer}</span> in {timeToNext}
           </p>
         </div>
       )}
