@@ -15,8 +15,15 @@ export default defineConfig(({ mode }) => ({
     componentTagger(),
   ].filter(Boolean),
   resolve: {
+    dedupe: ["react", "react-dom"],
     alias: {
       "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  optimizeDeps: {
+    include: ["react", "react-dom"],
+    esbuildOptions: {
+      define: { global: "globalThis" },
     },
   },
 }));
