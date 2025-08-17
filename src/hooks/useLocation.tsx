@@ -121,6 +121,11 @@ export const useLocation = () => {
     }
   };
 
+  const switchToAutoLocation = () => {
+    setIsManualLocation(false);
+    getCurrentLocation();
+  };
+
   useEffect(() => {
     getCurrentLocation();
   }, []);
@@ -132,6 +137,7 @@ export const useLocation = () => {
     isManualLocation,
     refetch: getCurrentLocation,
     requestLocation: getCurrentLocation,
-    setManualLocation
+    setManualLocation,
+    switchToAutoLocation
   };
 };

@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Loader2, MapPin, Search, ArrowLeft, Navigation } from "lucide-react";
+import { Loader2, MapPin, Search, ArrowLeft, Navigation, ToggleLeft, ToggleRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLocation } from "@/hooks/useLocation";
 import { usePlaces } from "@/hooks/usePlaces";
@@ -17,7 +17,8 @@ const HalalFood = () => {
   const [openNow, setOpenNow] = useState(false);
   const [manualAddress, setManualAddress] = useState("");
   const [showManualInput, setShowManualInput] = useState(false);
-  const { location, loading: locationLoading, error: locationError, isManualLocation, requestLocation, setManualLocation } = useLocation();
+  const [locationMode, setLocationMode] = useState<'auto' | 'manual'>('auto');
+  const { location, loading: locationLoading, error: locationError, isManualLocation, requestLocation, setManualLocation, switchToAutoLocation } = useLocation();
   const { places, loading: placesLoading, error: placesError, searchHalalFood } = usePlaces();
   const { toast } = useToast();
 
@@ -54,7 +55,21 @@ const HalalFood = () => {
   const handleManualLocationSubmit = async () => {
     if (manualAddress.trim()) {
       await setManualLocation(manualAddress.trim());
+      setLocationMode('manual');
       setShowManualInput(false);
+    }
+  };
+
+  const handleLocationModeToggle = () => {
+    const newMode = locationMode === 'auto' ? 'manual' : 'auto';
+    setLocationMode(newMode);
+    
+    if (newMode === 'auto') {
+      // Switch to automatic location
+      switchToAutoLocation();
+    } else {
+      // Switch to manual mode - show input
+      setShowManualInput(true);
     }
   };
 
@@ -136,19 +151,22 @@ const HalalFood = () => {
               <div className="flex items-center gap-2 text-success">
                 <MapPin className="h-4 w-4" />
                 <p className="text-sm font-inter">
-                  {isManualLocation ? "Manual location: " : "Current location: "}
+                  {locationMode === 'manual' ? "Manual location: " : "Auto location: "}
                   {location.city && location.country ? `${location.city}, ${location.country}` : 
                    `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`}
                 </p>
               </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setShowManualInput(!showManualInput)}
-                className="font-inter"
-              >
-                Set Location
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleLocationModeToggle}
+                  className="font-inter flex items-center gap-2"
+                >
+                  {locationMode === 'auto' ? <ToggleLeft className="h-4 w-4" /> : <ToggleRight className="h-4 w-4" />}
+                  {locationMode === 'auto' ? 'Switch to Manual' : 'Switch to Auto'}
+                </Button>
+              </div>
             </div>
           </Card>
         )}
