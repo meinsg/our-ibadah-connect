@@ -1,56 +1,36 @@
-import React from 'react';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./hooks/useAuth";
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import Mosques from "./pages/Mosques";
+import HalalFood from "./pages/HalalFood";
+import NotFound from "./pages/NotFound";
 
-// Test React availability step by step
-console.log('=== REACT DEBUG INFO ===');
-console.log('React object:', React);
-console.log('React.useState:', React?.useState);
-console.log('React.useEffect:', React?.useEffect);
-console.log('========================');
+const queryClient = new QueryClient();
 
-// Minimal test component
-const TestComponent = () => {
-  console.log('TestComponent rendering...');
-  
-  try {
-    const [count, setCount] = React.useState(0);
-    console.log('useState worked, count:', count);
-    
-    React.useEffect(() => {
-      console.log('useEffect worked!');
-    }, []);
-    
-    return (
-      <div style={{ padding: '20px', fontFamily: 'Arial', textAlign: 'center' }}>
-        <h1>React Test</h1>
-        <p>Count: {count}</p>
-        <button 
-          onClick={() => setCount(c => c + 1)}
-          style={{ padding: '10px 20px', margin: '10px', fontSize: '16px' }}
-        >
-          Increment ({count})
-        </button>
-        <p style={{ color: 'green', marginTop: '20px' }}>
-          ✅ React hooks are working!
-        </p>
-      </div>
-    );
-  } catch (error) {
-    console.error('Error in TestComponent:', error);
-    return (
-      <div style={{ padding: '20px', color: 'red', textAlign: 'center' }}>
-        <h1>React Error</h1>
-        <p>Error: {error?.message}</p>
-        <pre style={{ background: '#f5f5f5', padding: '10px', textAlign: 'left' }}>
-          {error?.stack}
-        </pre>
-      </div>
-    );
-  }
-};
-
-const App = () => {
-  console.log('App component rendering...');
-  return <TestComponent />;
-};
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/mosques" element={<Mosques />} />
+            <Route path="/halal-food" element={<HalalFood />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
 
 export default App;

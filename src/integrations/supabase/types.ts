@@ -14,57 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      prayer_logs: {
-        Row: {
-          created_at: string
-          date_iso: string
-          delay_minutes: number | null
-          geohash5: string
-          id: string
-          latitude: number
-          location_type: string
-          logged_at: string
-          longitude: number
-          planned_time: string | null
-          prayer: string
-          status: string
-          timezone: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          date_iso?: string
-          delay_minutes?: number | null
-          geohash5: string
-          id?: string
-          latitude: number
-          location_type: string
-          logged_at?: string
-          longitude: number
-          planned_time?: string | null
-          prayer: string
-          status: string
-          timezone?: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          date_iso?: string
-          delay_minutes?: number | null
-          geohash5?: string
-          id?: string
-          latitude?: number
-          location_type?: string
-          logged_at?: string
-          longitude?: number
-          planned_time?: string | null
-          prayer?: string
-          status?: string
-          timezone?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       prayer_times: {
         Row: {
           asr: string
@@ -151,10 +100,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      calculate_geohash5: {
-        Args: { lat: number; lng: number }
-        Returns: string
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
