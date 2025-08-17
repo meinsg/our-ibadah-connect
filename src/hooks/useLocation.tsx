@@ -28,6 +28,9 @@ export const useLocation = () => {
       async (position) => {
         const { latitude, longitude } = position.coords;
         
+        console.log('Raw GPS coordinates:', { latitude, longitude });
+        console.log('Position accuracy:', position.coords.accuracy, 'meters');
+        
         try {
           // Try to get city/country using reverse geocoding
           const response = await fetch(
@@ -36,6 +39,7 @@ export const useLocation = () => {
           
           if (response.ok) {
             const data = await response.json();
+            console.log('Reverse geocoding response:', data);
             setLocation({
               latitude,
               longitude,
