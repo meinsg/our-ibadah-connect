@@ -77,6 +77,7 @@ export const useLocation = () => {
     location,
     loading,
     error,
-    refetch: getCurrentLocation
+    refetch: getCurrentLocation,
+    requestLocation: getCurrentLocation
   };
 };

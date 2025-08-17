@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { 
   MapPin, 
   Users, 
@@ -17,14 +18,16 @@ const features = [
     title: "Find Mosques",
     description: "Locate nearby mosques with prayer times and facilities",
     color: "primary",
-    comingSoon: false
+    comingSoon: false,
+    path: "/mosques"
   },
   {
     icon: UtensilsCrossed,
     title: "Halal Food",
     description: "Discover halal restaurants and certified eateries",
     color: "secondary",
-    comingSoon: true
+    comingSoon: false,
+    path: "/halal-food"
   },
   {
     icon: Calendar,
@@ -86,13 +89,15 @@ const FeaturesGrid = () => {
                   Coming Soon
                 </div>
               ) : (
-                <Button 
-                  variant="secondary" 
-                  size="sm"
-                  className="font-inter text-xs sm:text-sm touch-manipulation"
-                >
-                  Explore
-                </Button>
+                <Link to={feature.path || "#"}>
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    className="font-inter text-xs sm:text-sm touch-manipulation"
+                  >
+                    Explore
+                  </Button>
+                </Link>
               )}
             </div>
           </Card>
