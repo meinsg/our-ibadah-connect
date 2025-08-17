@@ -3,9 +3,8 @@ import { Card } from "@/components/ui/card";
 import PrayerTimes from "@/components/PrayerTimes";
 import QiblaDirection from "@/components/QiblaDirection";
 import FeaturesGrid from "@/components/FeaturesGrid";
-import { Compass, Clock, MapPin, User, LogOut, ClipboardList, BarChart3 } from "lucide-react";
+import { Compass, Clock, MapPin, User, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import ShareButtons from "@/components/ShareButtons";
 import SocialFollow from "@/components/SocialFollow";
@@ -135,27 +134,6 @@ const Index = () => {
           </div>
 
           <FeaturesGrid />
-          
-          {/* Prayer Tracking Features */}
-          <div className="grid gap-4 sm:grid-cols-2 mt-8">
-            <Link to="/prayer-tracker" className="block p-6 bg-card border border-accent rounded-lg hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3 mb-2">
-                <ClipboardList className="h-5 w-5 text-primary" />
-                <h3 className="font-semibold text-foreground">Prayer Tracker</h3>
-                <Badge variant="secondary">New</Badge>
-              </div>
-              <p className="text-sm text-muted-foreground">Log your 5 daily prayers privately and track your spiritual consistency.</p>
-            </Link>
-            
-            <Link to="/prayer-analytics" className="block p-6 bg-card border border-accent rounded-lg hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3 mb-2">
-                <BarChart3 className="h-5 w-5 text-primary" />
-                <h3 className="font-semibold text-foreground">Prayer Analytics</h3>
-                <Badge variant="secondary">New</Badge>
-              </div>
-              <p className="text-sm text-muted-foreground">View your performance trends and anonymous community insights.</p>
-            </Link>
-          </div>
         </div>
       </section>
 
