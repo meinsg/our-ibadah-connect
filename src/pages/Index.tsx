@@ -5,14 +5,13 @@ import QiblaDirection from "@/components/QiblaDirection";
 import FeaturesGrid from "@/components/FeaturesGrid";
 import { Compass, Clock, MapPin, User, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
-// import { useAuth } from "@/hooks/useAuth";
+
 import ShareButtons from "@/components/ShareButtons";
 import SocialFollow from "@/components/SocialFollow";
 import logoIcon from "@/assets/logo-icon.png";
 import backgroundPattern from "@/assets/islamic-pattern-bg.jpg";
 
 const Index = () => {
-  // const { user, signOut } = useAuth();
   const user = null;
   const signOut = async () => {};
 
