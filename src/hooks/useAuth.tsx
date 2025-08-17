@@ -1,5 +1,5 @@
-import React, { useState, useEffect, createContext, useContext } from "react";
-import { User, Session } from "@supabase/supabase-js";
+import { useState, useEffect, createContext, useContext } from "react";
+import type { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AuthContextType {
@@ -24,13 +24,14 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Debug: check for duplicate React copies and hooks identity
-  console.log('[AuthProvider] React.version:', React.version, 'useState === React.useState?', useState === React.useState);
 
   useEffect(() => {
     // Set up auth state listener FIRST
