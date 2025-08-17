@@ -77,6 +77,7 @@ serve(async (req) => {
 
     const API_KEY = Deno.env.get('GOOGLE_MAPS_API_KEY');
     if (!API_KEY) {
+      console.error('Google Maps API key not found in environment variables');
       return new Response(
         JSON.stringify({ error: 'Google Maps API key not configured' }),
         { 
@@ -85,6 +86,8 @@ serve(async (req) => {
         }
       );
     }
+    
+    console.log('Making request to Google Places API with params:', { lat, lng, radius, keyword: 'halal' });
 
     const params = new URLSearchParams({
       key: API_KEY,
@@ -101,7 +104,8 @@ serve(async (req) => {
     const data: GooglePlacesResponse = await response.json();
 
     if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
-      throw new Error(`Google Places API error: ${data.status}`);
+      console.error('Google Places API error:', data.status, data.error_message);
+      throw new Error(`Google Places API error: ${data.status} - ${data.error_message || 'Unknown error'}`);
     }
 
     const places = (data.results || []).map(normalizePlace);
