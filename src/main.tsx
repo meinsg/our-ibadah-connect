@@ -103,6 +103,19 @@ const WorkingApp = () => {
             </a>
           </div>
         </div>
+
+        {/* Footer */}
+        <footer className="mt-16 pt-8 border-t">
+          <div className="text-center space-y-4">
+            <h4 className="text-lg font-semibold">Ouribadah</h4>
+            <p className="text-muted-foreground">Connecting Worship, Community, and Daily Life</p>
+            <div className="flex justify-center space-x-6 text-sm">
+              <a href="/privacy-policy" className="text-primary hover:underline">Privacy Policy</a>
+              <a href="/terms-of-service" className="text-primary hover:underline">Terms of Service</a>
+              <a href="/contact-us" className="text-primary hover:underline">Contact Us</a>
+            </div>
+          </div>
+        </footer>
       </main>
     </div>
   )
