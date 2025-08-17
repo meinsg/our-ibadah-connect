@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Clock, MapPin, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "@/hooks/useLocation";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 
