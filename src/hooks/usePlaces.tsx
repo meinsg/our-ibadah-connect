@@ -65,17 +65,26 @@ export const usePlaces = () => {
     options: UsePlacesOptions = {}
   ) => {
     try {
+      console.log('Starting halal food search...', { latitude, longitude, options });
       setLoading(true);
       setError(null);
 
+      console.log('Invoking places-halal function...');
       const { data, error } = await supabase.functions.invoke('places-halal', {
         body: { lat: latitude, lng: longitude, radius: options.radius || 5000, open_now: options.openNow }
       });
 
-      if (error) throw error;
+      console.log('Function response:', { data, error });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
       if (data?.items) {
+        console.log('Found places:', data.items.length);
         setPlaces(data.items);
       } else {
+        console.log('No places found in response');
         setPlaces([]);
       }
     } catch (err) {
