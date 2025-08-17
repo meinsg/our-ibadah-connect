@@ -27,6 +27,7 @@ export type Database = {
           longitude: number
           maghrib: string
           method: string
+          user_id: string
         }
         Insert: {
           asr: string
@@ -40,6 +41,7 @@ export type Database = {
           longitude: number
           maghrib: string
           method?: string
+          user_id: string
         }
         Update: {
           asr?: string
@@ -53,6 +55,7 @@ export type Database = {
           longitude?: number
           maghrib?: string
           method?: string
+          user_id?: string
         }
         Relationships: []
       }

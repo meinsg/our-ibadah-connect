@@ -17,11 +17,18 @@ export const usePrayerTimes = (latitude?: number, longitude?: number) => {
     try {
       setLoading(true);
       
-      // Check if we have cached prayer times for today
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('User must be authenticated to access prayer times');
+      }
+      
+      // Check if we have cached prayer times for today for this user
       const dateStr = date.toISOString().split('T')[0];
       const { data: cachedTimes } = await supabase
         .from('prayer_times')
         .select('*')
+        .eq('user_id', user.id)
         .eq('latitude', parseFloat(lat.toFixed(6)))
         .eq('longitude', parseFloat(lng.toFixed(6)))
         .eq('date', dateStr)
@@ -49,23 +56,29 @@ export const usePrayerTimes = (latitude?: number, longitude?: number) => {
         }
         
         const data = await response.json();
-        times = data.data.timings;
+        const apiTimes = data.data.timings;
         
-        // Cache the prayer times
-        const user = await supabase.auth.getUser();
-        if (user.data.user) {
-          await supabase.from('prayer_times').insert({
-            latitude: parseFloat(lat.toFixed(6)),
-            longitude: parseFloat(lng.toFixed(6)),
-            date: dateStr,
-            fajr: times.Fajr,
-            dhuhr: times.Dhuhr,
-            asr: times.Asr,
-            maghrib: times.Maghrib,
-            isha: times.Isha,
-            method: 'MWL'
-          });
-        }
+        // Cache the prayer times for this user
+        await supabase.from('prayer_times').insert({
+          user_id: user.id,
+          latitude: parseFloat(lat.toFixed(6)),
+          longitude: parseFloat(lng.toFixed(6)),
+          date: dateStr,
+          fajr: apiTimes.Fajr,
+          dhuhr: apiTimes.Dhuhr,
+          asr: apiTimes.Asr,
+          maghrib: apiTimes.Maghrib,
+          isha: apiTimes.Isha,
+          method: 'MWL'
+        });
+        
+        times = {
+          fajr: apiTimes.Fajr,
+          dhuhr: apiTimes.Dhuhr,
+          asr: apiTimes.Asr,
+          maghrib: apiTimes.Maghrib,
+          isha: apiTimes.Isha
+        };
       }
 
       // Format times and determine next prayer
@@ -73,11 +86,11 @@ export const usePrayerTimes = (latitude?: number, longitude?: number) => {
       const currentTime = now.getHours() * 60 + now.getMinutes();
       
       const prayers = [
-        { name: 'Fajr', time: cachedTimes ? cachedTimes.fajr : times.Fajr },
-        { name: 'Dhuhr', time: cachedTimes ? cachedTimes.dhuhr : times.Dhuhr },
-        { name: 'Asr', time: cachedTimes ? cachedTimes.asr : times.Asr },
-        { name: 'Maghrib', time: cachedTimes ? cachedTimes.maghrib : times.Maghrib },
-        { name: 'Isha', time: cachedTimes ? cachedTimes.isha : times.Isha }
+        { name: 'Fajr', time: times.fajr },
+        { name: 'Dhuhr', time: times.dhuhr },
+        { name: 'Asr', time: times.asr },
+        { name: 'Maghrib', time: times.maghrib },
+        { name: 'Isha', time: times.isha }
       ];
 
       let nextPrayerName = null;
