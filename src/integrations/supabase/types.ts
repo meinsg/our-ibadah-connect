@@ -14,7 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      prayer_times: {
+        Row: {
+          asr: string
+          created_at: string
+          date: string
+          dhuhr: string
+          fajr: string
+          id: string
+          isha: string
+          latitude: number
+          longitude: number
+          maghrib: string
+          method: string
+        }
+        Insert: {
+          asr: string
+          created_at?: string
+          date: string
+          dhuhr: string
+          fajr: string
+          id?: string
+          isha: string
+          latitude: number
+          longitude: number
+          maghrib: string
+          method?: string
+        }
+        Update: {
+          asr?: string
+          created_at?: string
+          date?: string
+          dhuhr?: string
+          fajr?: string
+          id?: string
+          isha?: string
+          latitude?: number
+          longitude?: number
+          maghrib?: string
+          method?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          location_city: string | null
+          location_country: string | null
+          notification_preferences: Json | null
+          prayer_calculation_method: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          location_city?: string | null
+          location_country?: string | null
+          notification_preferences?: Json | null
+          prayer_calculation_method?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          location_city?: string | null
+          location_country?: string | null
+          notification_preferences?: Json | null
+          prayer_calculation_method?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
