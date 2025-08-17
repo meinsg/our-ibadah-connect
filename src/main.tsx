@@ -1,23 +1,35 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
 import './index.css'
 
-// Register service worker for PWA
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then((registration) => {
-        console.log('SW registered: ', registration);
-      })
-      .catch((registrationError) => {
-        console.log('SW registration failed: ', registrationError);
-      });
-  });
-}
+// Completely minimal test - no external dependencies
+const MinimalApp = () => {
+  console.log('MinimalApp rendering, React is:', React);
+  console.log('useState available:', React.useState);
+  
+  const [count, setCount] = React.useState(0);
+  
+  React.useEffect(() => {
+    console.log('useEffect working!');
+  }, []);
 
-createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+  return (
+    <div style={{ padding: '20px', fontFamily: 'Arial' }}>
+      <h1>Minimal React Test</h1>
+      <p>If you can see this, React is working!</p>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(c => c + 1)} style={{ padding: '10px', marginRight: '10px' }}>
+        Increment
+      </button>
+      <button onClick={() => setCount(0)} style={{ padding: '10px' }}>
+        Reset
+      </button>
+    </div>
+  );
+};
+
+console.log('About to render, React is:', React);
+console.log('createRoot is:', createRoot);
+
+const root = createRoot(document.getElementById("root")!);
+root.render(<MinimalApp />);
