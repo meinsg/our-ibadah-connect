@@ -22,4 +22,10 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
   });
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  React.createElement('div', { style: { padding: '20px' } }, 
+    React.createElement('h1', null, 'Direct React Test - No Components'),
+    React.createElement('p', null, 'React Version: ' + React.version),
+    React.createElement('p', null, 'React useState: ' + typeof React.useState)
+  )
+);
