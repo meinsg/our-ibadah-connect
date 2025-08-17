@@ -1,0 +1,23 @@
+{
+  "name": "Ouribadah - Islamic Lifestyle App",
+  "short_name": "Ouribadah",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2d6a4f",
+  "description": "Find nearby mosques, halal restaurants, prayer times, and qibla direction",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/assets/logo-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/logo-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
