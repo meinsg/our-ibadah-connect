@@ -12,11 +12,13 @@ export const useLocation = () => {
   const [location, setLocation] = useState<LocationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isManualLocation, setIsManualLocation] = useState(false);
   const { toast } = useToast();
 
   const getCurrentLocation = () => {
     setLoading(true);
     setError(null);
+    setIsManualLocation(false);
 
     if (!navigator.geolocation) {
       setError("Geolocation is not supported by this browser");
@@ -61,7 +63,7 @@ export const useLocation = () => {
         setLoading(false);
         toast({
           title: "Location Access Denied",
-          description: "Please enable location access for accurate prayer times and Qibla direction.",
+          description: "Please enable location access or set your location manually.",
           variant: "destructive",
         });
       },
@@ -73,6 +75,52 @@ export const useLocation = () => {
     );
   };
 
+  const setManualLocation = async (address: string) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Use Nominatim (OpenStreetMap) for geocoding - free service
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1&addressdetails=1`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.length > 0) {
+          const result = data[0];
+          const latitude = parseFloat(result.lat);
+          const longitude = parseFloat(result.lon);
+          
+          setLocation({
+            latitude,
+            longitude,
+            city: result.address?.city || result.address?.town || result.address?.village,
+            country: result.address?.country
+          });
+          setIsManualLocation(true);
+          toast({
+            title: "Location Set",
+            description: `Location set to ${result.display_name}`,
+          });
+        } else {
+          throw new Error("Location not found");
+        }
+      } else {
+        throw new Error("Failed to geocode address");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to set location');
+      toast({
+        title: "Error",
+        description: "Could not find the specified location. Please try a different address.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     getCurrentLocation();
   }, []);
@@ -81,7 +129,9 @@ export const useLocation = () => {
     location,
     loading,
     error,
+    isManualLocation,
     refetch: getCurrentLocation,
-    requestLocation: getCurrentLocation
+    requestLocation: getCurrentLocation,
+    setManualLocation
   };
 };

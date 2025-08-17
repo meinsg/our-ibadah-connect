@@ -4,7 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Loader2, MapPin, Search, ArrowLeft } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, MapPin, Search, ArrowLeft, Navigation } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLocation } from "@/hooks/useLocation";
 import { usePlaces } from "@/hooks/usePlaces";
@@ -14,7 +15,9 @@ import { useToast } from "@/hooks/use-toast";
 const HalalFood = () => {
   const [radius, setRadius] = useState("5000");
   const [openNow, setOpenNow] = useState(false);
-  const { location, loading: locationLoading, error: locationError, requestLocation } = useLocation();
+  const [manualAddress, setManualAddress] = useState("");
+  const [showManualInput, setShowManualInput] = useState(false);
+  const { location, loading: locationLoading, error: locationError, isManualLocation, requestLocation, setManualLocation } = useLocation();
   const { places, loading: placesLoading, error: placesError, searchHalalFood } = usePlaces();
   const { toast } = useToast();
 
@@ -45,6 +48,13 @@ const HalalFood = () => {
       });
     } else {
       requestLocation();
+    }
+  };
+
+  const handleManualLocationSubmit = async () => {
+    if (manualAddress.trim()) {
+      await setManualLocation(manualAddress.trim());
+      setShowManualInput(false);
     }
   };
 
@@ -120,12 +130,71 @@ const HalalFood = () => {
         </Card>
 
         {/* Location Status */}
+        {location && (
+          <Card className="p-4 mb-6 border-success">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-success">
+                <MapPin className="h-4 w-4" />
+                <p className="text-sm font-inter">
+                  {isManualLocation ? "Manual location: " : "Current location: "}
+                  {location.city && location.country ? `${location.city}, ${location.country}` : 
+                   `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`}
+                </p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowManualInput(!showManualInput)}
+                className="font-inter"
+              >
+                Set Location
+              </Button>
+            </div>
+          </Card>
+        )}
+
+        {showManualInput && (
+          <Card className="p-4 mb-6">
+            <div className="space-y-3">
+              <Label htmlFor="manual-address" className="text-sm font-medium font-inter">
+                Enter your address or city
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="manual-address"
+                  placeholder="e.g., Singapore, Marina Bay"
+                  value={manualAddress}
+                  onChange={(e) => setManualAddress(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleManualLocationSubmit()}
+                  className="font-inter"
+                />
+                <Button 
+                  onClick={handleManualLocationSubmit}
+                  disabled={!manualAddress.trim() || locationLoading}
+                  size="sm"
+                  className="font-inter"
+                >
+                  {locationLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )}
+
         {locationError && (
           <Card className="p-4 mb-6 border-destructive">
-            <div className="flex items-center gap-2 text-destructive">
+            <div className="flex items-center gap-2 text-destructive mb-3">
               <MapPin className="h-4 w-4" />
               <p className="text-sm font-inter">{locationError}</p>
             </div>
+            <Button 
+              onClick={() => setShowManualInput(true)} 
+              variant="outline" 
+              size="sm" 
+              className="font-inter"
+            >
+              Set Location Manually
+            </Button>
           </Card>
         )}
 
@@ -136,9 +205,16 @@ const HalalFood = () => {
               <p className="text-sm text-muted-foreground font-inter mb-3">
                 Location access is needed to find nearby halal restaurants
               </p>
-              <Button onClick={requestLocation} variant="outline" size="sm" className="font-inter">
-                Enable Location
-              </Button>
+              <div className="flex gap-2 justify-center">
+                <Button onClick={requestLocation} variant="outline" size="sm" className="font-inter">
+                  <Navigation className="h-4 w-4 mr-2" />
+                  Use GPS
+                </Button>
+                <Button onClick={() => setShowManualInput(true)} variant="outline" size="sm" className="font-inter">
+                  <MapPin className="h-4 w-4 mr-2" />
+                  Set Manually
+                </Button>
+              </div>
             </div>
           </Card>
         )}
