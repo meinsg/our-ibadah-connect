@@ -126,29 +126,29 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-peaceful flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-peaceful flex items-center justify-center p-3 sm:p-4 safe-area-top safe-area-bottom">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <img src={logoIcon} alt="Ouribadah" className="w-16 h-16 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-primary font-amiri">Ouribadah</h1>
-          <p className="text-muted-foreground font-inter">Our Worship</p>
+        <div className="text-center mb-6 sm:mb-8">
+          <img src={logoIcon} alt="Ouribadah" className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary font-amiri">Ouribadah</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground font-inter">Our Worship</p>
         </div>
 
-        <Card className="p-6 shadow-prayer bg-spiritual border-accent">
-          <div className="space-y-6">
+        <Card className="p-4 sm:p-6 shadow-prayer bg-spiritual border-accent">
+          <div className="space-y-4 sm:space-y-6">
             <div className="text-center">
-              <h2 className="text-2xl font-semibold text-foreground font-inter">
+              <h2 className="text-xl sm:text-2xl font-semibold text-foreground font-inter">
                 {isLogin ? "Welcome Back" : "Join Our Community"}
               </h2>
-              <p className="text-muted-foreground text-sm mt-2 font-inter">
+              <p className="text-muted-foreground text-xs sm:text-sm mt-2 font-inter">
                 {isLogin ? "Sign in to continue your spiritual journey" : "Create your account to get started"}
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {!isLogin && (
                 <div className="space-y-2">
-                  <Label htmlFor="fullName" className="font-inter">Full Name</Label>
+                  <Label htmlFor="fullName" className="font-inter text-sm">Full Name</Label>
                   <div className="relative">
                     <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -157,7 +157,7 @@ const Auth = () => {
                       placeholder="Enter your full name"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 text-sm sm:text-base h-11 sm:h-12 touch-manipulation"
                       required
                     />
                   </div>
@@ -165,7 +165,7 @@ const Auth = () => {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="font-inter">Email</Label>
+                <Label htmlFor="email" className="font-inter text-sm">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -174,14 +174,14 @@ const Auth = () => {
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 text-sm sm:text-base h-11 sm:h-12 touch-manipulation"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="font-inter">Password</Label>
+                <Label htmlFor="password" className="font-inter text-sm">Password</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -190,7 +190,7 @@ const Auth = () => {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 text-sm sm:text-base h-11 sm:h-12 touch-manipulation"
                     required
                   />
                 </div>
@@ -200,7 +200,7 @@ const Auth = () => {
             <Button
               onClick={isLogin ? handleSignIn : handleSignUp}
               disabled={loading || !email || !password || (!isLogin && !fullName)}
-              className="w-full font-inter"
+              className="w-full font-inter text-sm sm:text-base h-11 sm:h-12 touch-manipulation"
               size="lg"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -211,7 +211,7 @@ const Auth = () => {
               <button
                 type="button"
                 onClick={() => setIsLogin(!isLogin)}
-                className="text-primary hover:text-primary/80 text-sm font-inter underline"
+                className="text-primary hover:text-primary/80 text-xs sm:text-sm font-inter underline touch-manipulation"
               >
                 {isLogin ? "Need an account? Sign up" : "Already have an account? Sign in"}
               </button>
@@ -220,7 +220,7 @@ const Auth = () => {
             <div className="text-center">
               <Link 
                 to="/" 
-                className="text-muted-foreground hover:text-foreground text-sm font-inter"
+                className="text-muted-foreground hover:text-foreground text-xs sm:text-sm font-inter touch-manipulation"
               >
                 Continue as Guest
               </Link>
