@@ -88,6 +88,8 @@ serve(async (req) => {
     }
     
     console.log('Making request to Google Places API with params:', { lat, lng, radius, keyword: 'halal' });
+    console.log('API_KEY present:', !!API_KEY);
+    console.log('API_KEY length:', API_KEY?.length);
 
     const params = new URLSearchParams({
       key: API_KEY,
@@ -99,9 +101,14 @@ serve(async (req) => {
     });
 
     const googleMapsUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?${params}`;
+    console.log('Google Maps URL (without API key):', googleMapsUrl.replace(API_KEY, '[REDACTED]'));
     
     const response = await fetch(googleMapsUrl);
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+    
     const data: GooglePlacesResponse = await response.json();
+    console.log('Google Places API response:', JSON.stringify(data, null, 2));
 
     if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
       console.error('Google Places API error:', data.status, data.error_message);
