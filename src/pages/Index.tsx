@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import PrayerTimes from "@/components/PrayerTimes";
-import QiblaDirection from "@/components/QiblaDirection";
+import QiblahCompass from "@/components/QiblahCompass";
 import FeaturesGrid from "@/components/FeaturesGrid";
 import { Compass, Clock, MapPin, User, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -122,7 +122,7 @@ const Index = () => {
               <PrayerTimes />
             </div>
             <div>
-              <QiblaDirection />
+              <QiblahCompass />
             </div>
           </div>
 
