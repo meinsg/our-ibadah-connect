@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ouribadah - Project Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0d9488;
+      --primary-light: #14b8a6;
+      --secondary: #1e3a5f;
+      --accent: #d4af37;
+      --text: #1f2937;
+      --text-light: #6b7280;
+      --bg: #ffffff;
+      --bg-alt: #f9fafb;
+      --border: #e5e7eb;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text);
+      line-height: 1.6;
+      background: var(--bg);
+      font-size: 14px;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        font-size: 11pt;
+        line-height: 1.5;
+      }
+      
+      .no-print {
+        display: none !important;
+      }
+      
+      .page-break {
+        page-break-before: always;
+      }
+      
+      section {
+        page-break-inside: avoid;
+      }
+      
+      h2 {
+        page-break-after: avoid;
+      }
+      
+      table {
+        page-break-inside: avoid;
+      }
+
+      .header {
+        background: var(--secondary) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--secondary) 0%, #0f172a 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.5;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo {
+      font-family: 'Amiri', serif;
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-bottom: 1.5rem;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    .meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Print Button */
+    .print-btn {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(13, 148, 136, 0.4);
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+
+    .print-btn:hover {
+      background: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(13, 148, 136, 0.5);
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Table of Contents */
+    .toc {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .toc h2 {
+      color: var(--secondary);
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .toc-list {
+      list-style: none;
+      columns: 2;
+      column-gap: 2rem;
+    }
+
+    .toc-list li {
+      margin-bottom: 0.5rem;
+    }
+
+    .toc-list a {
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.2s;
+    }
+
+    .toc-list a:hover {
+      color: var(--primary);
+    }
+
+    .toc-list .num {
+      color: var(--primary);
+      font-weight: 600;
+      min-width: 1.5rem;
+    }
+
+    /* Sections */
+    section {
+      margin-bottom: 3rem;
+    }
+
+    h2 {
+      color: var(--secondary);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 3px solid var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    h2 .section-num {
+      background: var(--primary);
+      color: white;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    h3 {
+      color: var(--secondary);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 1.5rem 0 1rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    thead {
+      background: var(--secondary);
+      color: white;
+    }
+
+    th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr:nth-child(even) {
+      background: var(--bg-alt);
+    }
+
+    tbody tr:hover {
+      background: #f0fdfa;
+    }
+
+    /* Code blocks */
+    code {
+      background: #f1f5f9;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 0.85em;
+      color: #0f766e;
+    }
+
+    pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    /* Feature Cards */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .feature-card {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    .feature-card h4 {
+      color: var(--secondary);
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin: 0;
+    }
+
+    /* Status badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-info {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    /* Access table */
+    .access-icon {
+      font-size: 1.1rem;
+    }
+
+    .access-yes {
+      color: #16a34a;
+    }
+
+    .access-no {
+      color: #dc2626;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-alt);
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      margin-top: 3rem;
+    }
+
+    .footer-logo {
+      font-family: 'Amiri', serif;
+      font-size: 1.5rem;
+      color: var(--secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .toc-list {
+        columns: 1;
+      }
+      
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .meta {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Print Button -->
+  <button class="print-btn no-print" onclick="window.print()">
+    🖨️ Print / Save as PDF
+  </button>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">Ouribadah</div>
+      <p class="subtitle">Islamic Lifestyle Application - Technical Documentation</p>
+      <div class="meta">
+        <span>📋 Version 1.0</span>
+        <span>📅 December 28, 2025</span>
+        <span>⚙️ React + TypeScript + Supabase</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container">
+    
+    <!-- Table of Contents -->
+    <nav class="toc no-print">
+      <h2>📑 Table of Contents</h2>
+      <ol class="toc-list">
+        <li><a href="#overview"><span class="num">1.</span> Project Overview</a></li>
+        <li><a href="#tech-stack"><span class="num">2.</span> Technology Stack</a></li>
+        <li><a href="#features"><span class="num">3.</span> Core Features</a></li>
+        <li><a href="#apis"><span class="num">4.</span> Third-Party APIs</a></li>
+        <li><a href="#database"><span class="num">5.</span> Database Schema</a></li>
+        <li><a href="#edge-functions"><span class="num">6.</span> Edge Functions</a></li>
+        <li><a href="#access-levels"><span class="num">7.</span> User Access Levels</a></li>
+        <li><a href="#security"><span class="num">8.</span> Security Features</a></li>
+        <li><a href="#browser"><span class="num">9.</span> Browser Requirements</a></li>
+        <li><a href="#structure"><span class="num">10.</span> Project Structure</a></li>
+      </ol>
+    </nav>
+
+    <!-- Section 1: Overview -->
+    <section id="overview">
+      <h2><span class="section-num">1</span> Project Overview</h2>
+      <p><strong>Ouribadah</strong> is a comprehensive Islamic lifestyle web application designed to help Muslims manage their daily worship and find Islamic services nearby. The application provides essential tools for prayer management, Qibla direction, and location-based services for mosques and halal food establishments.</p>
+      
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h4>🕌 Prayer Management</h4>
+          <p>Accurate prayer times with caching and logging for registered users</p>
+        </div>
+        <div class="feature-card">
+          <h4>🧭 Qibla Direction</h4>
+          <p>Real-time compass using device sensors and geolocation</p>
+        </div>
+        <div class="feature-card">
+          <h4>📍 Mosque Finder</h4>
+          <p>Locate nearby mosques with ratings, distance, and open status</p>
+        </div>
+        <div class="feature-card">
+          <h4>🍽️ Halal Food</h4>
+          <p>Discover halal restaurants with filtering options</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Tech Stack -->
+    <section id="tech-stack">
+      <h2><span class="section-num">2</span> Technology Stack</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Technology</th>
+            <th>Version</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Frontend Framework</td>
+            <td>React</td>
+            <td>18.3.1</td>
+          </tr>
+          <tr>
+            <td>Language</td>
+            <td>TypeScript</td>
+            <td>Latest</td>
+          </tr>
+          <tr>
+            <td>Styling</td>
+            <td>Tailwind CSS</td>
+            <td>Latest</td>
+          </tr>
+          <tr>
+            <td>UI Components</td>
+            <td>shadcn/ui (Radix UI)</td>
+            <td>Latest</td>
+          </tr>
+          <tr>
+            <td>Build Tool</td>
+            <td>Vite</td>
+            <td>Latest</td>
+          </tr>
+          <tr>
+            <td>Backend</td>
+            <td>Supabase (PostgreSQL + Edge Functions)</td>
+            <td>Latest</td>
+          </tr>
+          <tr>
+            <td>State Management</td>
+            <td>TanStack React Query</td>
+            <td>5.x</td>
+          </tr>
+          <tr>
+            <td>Routing</td>
+            <td>React Router DOM</td>
+            <td>6.x</td>
+          </tr>
+          <tr>
+            <td>Form Handling</td>
+            <td>React Hook Form + Zod</td>
+            <td>7.x / 3.x</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section 3: Features -->
+    <section id="features" class="page-break">
+      <h2><span class="section-num">3</span> Core Features</h2>
+      
+      <h3>3.1 Prayer Times</h3>
+      <table>
+        <tbody>
+          <tr>
+            <td><strong>Description</strong></td>
+            <td>Displays the 5 daily Islamic prayer times (Fajr, Dhuhr, Asr, Maghrib, Isha) based on user's geographic location</td>
+          </tr>
+          <tr>
+            <td><strong>API Used</strong></td>
+            <td>Aladhan API (free, no API key required)</td>
+          </tr>
+          <tr>
+            <td><strong>Calculation Methods</strong></td>
+            <td>Supports multiple methods (MWL, ISNA, Egyptian, etc.)</td>
+          </tr>
+          <tr>
+            <td><strong>Caching</strong></td>
+            <td>Prayer times are cached in database for registered users</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>3.2 Qibla Compass</h3>
+      <table>
+        <tbody>
+          <tr>
+            <td><strong>Description</strong></td>
+            <td>Interactive compass showing direction to the Kaaba in Mecca</td>
+          </tr>
+          <tr>
+            <td><strong>Browser APIs</strong></td>
+            <td>Geolocation API, DeviceOrientationEvent API</td>
+          </tr>
+          <tr>
+            <td><strong>Calculation</strong></td>
+            <td>Spherical trigonometry for accurate Qibla bearing</td>
+          </tr>
+          <tr>
+            <td><strong>Geocoding APIs</strong></td>
+            <td>BigDataCloud (reverse), Nominatim/OSM (forward)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>3.3 Find Nearby Mosques</h3>
+      <table>
+        <tbody>
+          <tr>
+            <td><strong>Description</strong></td>
+            <td>Search for mosques near user's location with advanced filters</td>
+          </tr>
+          <tr>
+            <td><strong>API Used</strong></td>
+            <td>Google Places API (requires API key)</td>
+          </tr>
+          <tr>
+            <td><strong>Features</strong></td>
+            <td>Radius filtering (1-20km), "Open Now" filter, manual address input, ratings display</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>3.4 Find Halal Food</h3>
+      <table>
+        <tbody>
+          <tr>
+            <td><strong>Description</strong></td>
+            <td>Search for halal restaurants and food establishments</td>
+          </tr>
+          <tr>
+            <td><strong>API Used</strong></td>
+            <td>Google Places API (requires API key)</td>
+          </tr>
+          <tr>
+            <td><strong>Features</strong></td>
+            <td>Radius filtering, "Open Now" filter, halal-specific filtering, price level display</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section 4: APIs -->
+    <section id="apis">
+      <h2><span class="section-num">4</span> Third-Party APIs</h2>
+      
+      <h3>4.1 APIs Requiring API Keys</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>API</th>
+            <th>Purpose</th>
+            <th>Secret Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Google Places API</td>
+            <td>Mosque & Halal food search</td>
+            <td><code>GOOGLE_MAPS_API_KEY</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>4.2 Free APIs (No Key Required)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>API</th>
+            <th>Purpose</th>
+            <th>Endpoint</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Aladhan API</td>
+            <td>Prayer times calculation</td>
+            <td><code>api.aladhan.com</code></td>
+          </tr>
+          <tr>
+            <td>BigDataCloud</td>
+            <td>Reverse geocoding (coords → address)</td>
+            <td><code>api.bigdatacloud.net</code></td>
+          </tr>
+          <tr>
+            <td>Nominatim (OSM)</td>
+            <td>Forward geocoding (address → coords)</td>
+            <td><code>nominatim.openstreetmap.org</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section 5: Database -->
+    <section id="database" class="page-break">
+      <h2><span class="section-num">5</span> Database Schema</h2>
+      
+      <h3>5.1 Tables Overview</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Table</th>
+            <th>Description</th>
+            <th>RLS Enabled</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>profiles</code></td>
+            <td>User profile and preferences</td>
+            <td><span class="badge badge-success">✓ Yes</span></td>
+          </tr>
+          <tr>
+            <td><code>prayer_times</code></td>
+            <td>Cached prayer times per user/location</td>
+            <td><span class="badge badge-success">✓ Yes</span></td>
+          </tr>
+          <tr>
+            <td><code>prayer_logs</code></td>
+            <td>Prayer completion tracking</td>
+            <td><span class="badge badge-success">✓ Yes</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>5.2 Table: <code>profiles</code></h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>UUID</td><td>Primary key</td></tr>
+          <tr><td><code>user_id</code></td><td>UUID</td><td>Reference to auth user</td></tr>
+          <tr><td><code>full_name</code></td><td>TEXT</td><td>User's display name</td></tr>
+          <tr><td><code>location_city</code></td><td>TEXT</td><td>User's city</td></tr>
+          <tr><td><code>location_country</code></td><td>TEXT</td><td>User's country</td></tr>
+          <tr><td><code>prayer_calculation_method</code></td><td>TEXT</td><td>Preferred calculation method</td></tr>
+          <tr><td><code>notification_preferences</code></td><td>JSONB</td><td>Per-prayer notification settings</td></tr>
+          <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>Record creation time</td></tr>
+          <tr><td><code>updated_at</code></td><td>TIMESTAMP</td><td>Last update time</td></tr>
+        </tbody>
+      </table>
+
+      <h3>5.3 Table: <code>prayer_times</code></h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>UUID</td><td>Primary key</td></tr>
+          <tr><td><code>user_id</code></td><td>UUID</td><td>Reference to auth user</td></tr>
+          <tr><td><code>latitude</code></td><td>NUMERIC</td><td>Location latitude</td></tr>
+          <tr><td><code>longitude</code></td><td>NUMERIC</td><td>Location longitude</td></tr>
+          <tr><td><code>date</code></td><td>DATE</td><td>Date of prayer times</td></tr>
+          <tr><td><code>fajr, dhuhr, asr, maghrib, isha</code></td><td>TIME</td><td>Prayer times</td></tr>
+          <tr><td><code>method</code></td><td>TEXT</td><td>Calculation method used</td></tr>
+          <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>Record creation time</td></tr>
+        </tbody>
+      </table>
+
+      <h3>5.4 Table: <code>prayer_logs</code></h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>UUID</td><td>Primary key</td></tr>
+          <tr><td><code>user_id</code></td><td>UUID</td><td>Reference to auth user</td></tr>
+          <tr><td><code>prayer</code></td><td>TEXT</td><td>Prayer name (fajr, dhuhr, etc.)</td></tr>
+          <tr><td><code>status</code></td><td>TEXT</td><td>Completion status</td></tr>
+          <tr><td><code>date_iso</code></td><td>DATE</td><td>Date of prayer</td></tr>
+          <tr><td><code>logged_at</code></td><td>TIMESTAMP</td><td>When prayer was logged</td></tr>
+          <tr><td><code>delay_minutes</code></td><td>INTEGER</td><td>Minutes after scheduled time</td></tr>
+          <tr><td><code>geohash5</code></td><td>TEXT</td><td>5-character geohash for location</td></tr>
+          <tr><td><code>location_type</code></td><td>TEXT</td><td>Type of location</td></tr>
+          <tr><td><code>timezone</code></td><td>TEXT</td><td>User's timezone</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section 6: Edge Functions -->
+    <section id="edge-functions">
+      <h2><span class="section-num">6</span> Supabase Edge Functions</h2>
+      
+      <h3>6.1 <code>places-mosques</code></h3>
+      <table>
+        <tbody>
+          <tr><td><strong>Purpose</strong></td><td>Fetch nearby mosques from Google Places API</td></tr>
+          <tr><td><strong>Method</strong></td><td>GET / POST</td></tr>
+          <tr><td><strong>Parameters</strong></td><td>
+            <code>latitude</code> (required), <code>longitude</code> (required), 
+            <code>radius</code> (optional, default: 5000m), 
+            <code>openNow</code> (optional)
+          </td></tr>
+        </tbody>
+      </table>
+
+      <h3>6.2 <code>places-halal</code></h3>
+      <table>
+        <tbody>
+          <tr><td><strong>Purpose</strong></td><td>Fetch nearby halal restaurants from Google Places API</td></tr>
+          <tr><td><strong>Method</strong></td><td>GET / POST</td></tr>
+          <tr><td><strong>Parameters</strong></td><td>
+            <code>latitude</code> (required), <code>longitude</code> (required), 
+            <code>radius</code> (optional), 
+            <code>openNow</code> (optional)
+          </td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section 7: Access Levels -->
+    <section id="access-levels" class="page-break">
+      <h2><span class="section-num">7</span> User Access Levels</h2>
+      
+      <h3>7.1 Feature Comparison</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Guest</th>
+            <th>Registered User</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>View Prayer Times</td>
+            <td><span class="access-icon access-yes">✓</span></td>
+            <td><span class="access-icon access-yes">✓</span></td>
+          </tr>
+          <tr>
+            <td>Qibla Compass</td>
+            <td><span class="access-icon access-yes">✓</span></td>
+            <td><span class="access-icon access-yes">✓</span></td>
+          </tr>
+          <tr>
+            <td>Find Mosques</td>
+            <td><span class="access-icon access-yes">✓</span></td>
+            <td><span class="access-icon access-yes">✓</span></td>
+          </tr>
+          <tr>
+            <td>Find Halal Food</td>
+            <td><span class="access-icon access-yes">✓</span></td>
+            <td><span class="access-icon access-yes">✓</span></td>
+          </tr>
+          <tr>
+            <td>Prayer Time Caching</td>
+            <td><span class="access-icon access-no">✗</span></td>
+            <td><span class="access-icon access-yes">✓</span> Cached to DB</td>
+          </tr>
+          <tr>
+            <td>Prayer Logging</td>
+            <td><span class="access-icon access-no">✗</span></td>
+            <td><span class="access-icon access-yes">✓</span> Track & Log</td>
+          </tr>
+          <tr>
+            <td>Profile Settings</td>
+            <td><span class="access-icon access-no">✗</span></td>
+            <td><span class="access-icon access-yes">✓</span></td>
+          </tr>
+          <tr>
+            <td>Notification Preferences</td>
+            <td><span class="access-icon access-no">✗</span></td>
+            <td><span class="access-icon access-yes">✓</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section 8: Security -->
+    <section id="security">
+      <h2><span class="section-num">8</span> Security Features</h2>
+      
+      <h3>8.1 Row-Level Security (RLS)</h3>
+      <p>All database tables have RLS enabled with the following policies:</p>
+      <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+        <li>Users can only <strong>view</strong> their own data</li>
+        <li>Users can only <strong>insert</strong> their own data</li>
+        <li>Users can only <strong>update</strong> their own data</li>
+        <li>Users can only <strong>delete</strong> their own data (except profiles)</li>
+      </ul>
+
+      <h3>8.2 API Key Protection</h3>
+      <table>
+        <tbody>
+          <tr>
+            <td><strong>Storage</strong></td>
+            <td>Google Maps API key is stored as a Supabase secret</td>
+          </tr>
+          <tr>
+            <td><strong>Client Exposure</strong></td>
+            <td>Never exposed to client-side code</td>
+          </tr>
+          <tr>
+            <td><strong>Access</strong></td>
+            <td>Only accessible in Edge Functions (server-side)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section 9: Browser -->
+    <section id="browser">
+      <h2><span class="section-num">9</span> Browser Requirements</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Requirement</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Geolocation API</td>
+            <td>HTTPS required</td>
+          </tr>
+          <tr>
+            <td>Device Orientation</td>
+            <td>HTTPS required, iOS requires explicit permission</td>
+          </tr>
+          <tr>
+            <td>General</td>
+            <td>Modern browser (Chrome, Firefox, Safari, Edge)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section 10: Structure -->
+    <section id="structure">
+      <h2><span class="section-num">10</span> Project Structure</h2>
+      <pre><code>src/
+├── components/
+│   ├── ui/              # shadcn/ui components
+│   ├── PrayerTimes.tsx  # Prayer times display
+│   ├── QiblahCompass.tsx # Qibla direction
+│   ├── PlaceCard.tsx    # Mosque/restaurant card
+│   └── ...
+├── hooks/
+│   ├── useAuth.tsx      # Authentication hook
+│   ├── useLocation.tsx  # Geolocation hook
+│   ├── usePrayerTimes.tsx # Prayer times logic
+│   ├── useQibla.tsx     # Qibla calculation
+│   └── usePlaces.tsx    # Places search
+├── pages/
+│   ├── Index.tsx        # Landing page
+│   ├── Mosques.tsx      # Mosque finder
+│   ├── HalalFood.tsx    # Halal food finder
+│   ├── Auth.tsx         # Authentication
+│   └── ...
+├── integrations/
+│   └── supabase/        # Supabase client & types
+└── lib/
+    └── qiblaMath.ts     # Qibla calculations
+
+supabase/
+├── functions/
+│   ├── places-mosques/  # Mosque search function
+│   ├── places-halal/    # Halal food search function
+│   └── _shared/         # Shared utilities
+└── config.toml          # Supabase configuration</code></pre>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-logo">Ouribadah</div>
+    <p>This documentation reflects the current state of the Ouribadah project.</p>
+    <p style="margin-top: 0.5rem; font-size: 0.8rem;">Generated on December 28, 2025</p>
+  </footer>
+
+</body>
+</html>
