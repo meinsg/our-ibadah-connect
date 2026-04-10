@@ -19,7 +19,7 @@ const HalalFood = () => {
   const [showManualInput, setShowManualInput] = useState(false);
   const [locationMode, setLocationMode] = useState<'auto' | 'manual'>('auto');
   const { location, loading: locationLoading, error: locationError, requestLocation, setManualLocation, switchToAutoLocation } = useSharedLocation();
-  const { places, loading: placesLoading, error: placesError, searchHalalFood } = usePlaces();
+  const { places, generalPlaces, loading: placesLoading, error: placesError, isMuslimRegion, searchHalalFood } = usePlaces();
   const { toast } = useToast();
 
   useEffect(() => {
