@@ -1,24 +1,28 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
 
-interface OverpassElement {
-  id: number;
-  lat?: number;
-  lon?: number;
-  center?: { lat: number; lon: number };
-  tags?: Record<string, string>;
+interface GeoapifyFeature {
+  properties: {
+    place_id: string;
+    name?: string;
+    formatted?: string;
+    street?: string;
+    city?: string;
+    country?: string;
+    lat: number;
+    lon: number;
+    categories?: string[];
+  };
 }
 
-function normalizePlace(el: OverpassElement) {
-  const lat = el.lat ?? el.center?.lat ?? 0;
-  const lon = el.lon ?? el.center?.lon ?? 0;
-  const tags = el.tags || {};
+function normalizePlace(feature: GeoapifyFeature) {
+  const p = feature.properties;
   return {
-    id: `osm-${el.id}`,
-    name: tags.name || tags['name:en'] || tags['name:ar'] || 'Mosque',
-    address: [tags['addr:street'], tags['addr:city'], tags['addr:country']].filter(Boolean).join(', ') || tags.address || '',
-    lat,
-    lng: lon,
+    id: p.place_id,
+    name: p.name || 'Mosque',
+    address: p.formatted || [p.street, p.city, p.country].filter(Boolean).join(', '),
+    lat: p.lat,
+    lng: p.lon,
     rating: null,
     user_ratings_total: null,
     open_now: null,
@@ -56,40 +60,42 @@ serve(async (req) => {
       );
     }
 
-    // Overpass QL query for mosques within radius
-    const query = `
-      [out:json][timeout:15];
-      (
-        node["amenity"="place_of_worship"]["religion"="muslim"](around:${radius},${lat},${lng});
-        way["amenity"="place_of_worship"]["religion"="muslim"](around:${radius},${lat},${lng});
-        node["building"="mosque"](around:${radius},${lat},${lng});
-        way["building"="mosque"](around:${radius},${lat},${lng});
+    const API_KEY = Deno.env.get('GEOAPIFY_API_KEY');
+    if (!API_KEY) {
+      return new Response(
+        JSON.stringify({ error: 'Geoapify API key not configured' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
-      out center body;
-    `;
+    }
 
-    const response = await fetch('https://overpass-api.de/api/interpreter', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `data=${encodeURIComponent(query)}`,
+    const params = new URLSearchParams({
+      categories: 'religion.place_of_worship',
+      conditions: 'named',
+      filter: `circle:${lng},${lat},${radius}`,
+      bias: `proximity:${lng},${lat}`,
+      limit: '50',
+      apiKey: API_KEY,
     });
 
+    const url = `https://api.geoapify.com/v2/places?${params}`;
+    const response = await fetch(url);
+
     if (!response.ok) {
-      throw new Error(`Overpass API error: ${response.status}`);
+      const text = await response.text();
+      throw new Error(`Geoapify API error: ${response.status} - ${text}`);
     }
 
     const data = await response.json();
-    const elements: OverpassElement[] = data.elements || [];
+    const features: GeoapifyFeature[] = data.features || [];
 
-    // Deduplicate by ID
-    const seen = new Set<number>();
-    const unique = elements.filter(el => {
-      if (seen.has(el.id)) return false;
-      seen.add(el.id);
-      return true;
-    });
-
-    const places = unique.map(normalizePlace).filter(p => p.lat !== 0 && p.lng !== 0);
+    // Filter to mosque/islamic places
+    const mosqueKeywords = /mosque|masjid|مسجد|mosquée|islam/i;
+    const places = features
+      .map(normalizePlace)
+      .filter(p => {
+        const cats = (data.features?.find((f: GeoapifyFeature) => f.properties.place_id === p.id)?.properties.categories || []).join(' ');
+        return mosqueKeywords.test(p.name) || mosqueKeywords.test(p.address) || cats.includes('islam');
+      });
 
     return new Response(
       JSON.stringify({ items: places }),
