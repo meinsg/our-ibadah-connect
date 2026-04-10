@@ -23,13 +23,13 @@ const Mosques = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (location && !placesLoading) {
+    if (location) {
       searchMosques(location.latitude, location.longitude, {
         radius: parseInt(radius),
         openNow
       });
     }
-  }, [location, radius, openNow, searchMosques, placesLoading]);
+  }, [location, radius, openNow]);
 
   useEffect(() => {
     if (placesError) {
