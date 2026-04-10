@@ -1,15 +1,13 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { 
-  MapPin, 
-  Users, 
-  Calendar, 
+import {
+  Users,
+  Calendar,
   UtensilsCrossed,
   Building2,
   BookOpen,
   Clock,
-  Compass
 } from "lucide-react";
 
 const features = [
@@ -19,7 +17,7 @@ const features = [
     description: "Locate nearby mosques with prayer times and facilities",
     color: "primary",
     comingSoon: false,
-    path: "/mosques"
+    path: "/mosques",
   },
   {
     icon: UtensilsCrossed,
@@ -27,36 +25,36 @@ const features = [
     description: "Discover halal restaurants and certified eateries",
     color: "secondary",
     comingSoon: false,
-    path: "/halal-food"
+    path: "/halal-food",
   },
   {
     icon: Calendar,
     title: "Islamic Events",
     description: "Browse local dawah events and community gatherings",
     color: "gold",
-    comingSoon: true
+    comingSoon: true,
   },
   {
     icon: Users,
     title: "Connect",
     description: "Join Muslim community groups and discussions",
     color: "primary",
-    comingSoon: true
+    comingSoon: true,
   },
   {
     icon: BookOpen,
     title: "Islamic Resources",
     description: "Access Quran, Hadith, and educational content",
     color: "secondary",
-    comingSoon: true
+    comingSoon: true,
   },
   {
     icon: Clock,
     title: "Prayer Reminders",
     description: "Customizable adhan notifications and reminders",
     color: "gold",
-    comingSoon: true
-  }
+    comingSoon: true,
+  },
 ];
 
 const FeaturesGrid = () => {
@@ -75,11 +73,11 @@ const FeaturesGrid = () => {
               `}>
                 <Icon className="h-6 w-6 sm:h-8 sm:w-8" />
               </div>
-              
+
               <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 font-inter">
                 {feature.title}
               </h3>
-              
+
               <p className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4 font-inter leading-relaxed px-2">
                 {feature.description}
               </p>
@@ -90,8 +88,8 @@ const FeaturesGrid = () => {
                 </div>
               ) : (
                 <Link to={feature.path || "#"}>
-                  <Button 
-                    variant="secondary" 
+                  <Button
+                    variant="secondary"
                     size="sm"
                     className="font-inter text-xs sm:text-sm touch-manipulation"
                   >

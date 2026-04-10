@@ -33,13 +33,6 @@ export const usePlaces = () => {
       setLoading(true);
       setError(null);
 
-      const params = new URLSearchParams({
-        lat: latitude.toString(),
-        lng: longitude.toString(),
-        radius: (options.radius || 5000).toString(),
-        ...(options.openNow && { open_now: 'true' })
-      });
-
       const { data, error } = await supabase.functions.invoke('places-mosques', {
         body: { lat: latitude, lng: longitude, radius: options.radius || 5000, open_now: options.openNow }
       });
