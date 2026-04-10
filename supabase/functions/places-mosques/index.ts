@@ -88,14 +88,7 @@ serve(async (req) => {
     const data = await response.json();
     const features: GeoapifyFeature[] = data.features || [];
 
-    // Filter to mosque/islamic places
-    const mosqueKeywords = /mosque|masjid|مسجد|mosquée|islam/i;
-    const places = features
-      .map(normalizePlace)
-      .filter(p => {
-        const cats = (data.features?.find((f: GeoapifyFeature) => f.properties.place_id === p.id)?.properties.categories || []).join(' ');
-        return mosqueKeywords.test(p.name) || mosqueKeywords.test(p.address) || cats.includes('islam');
-      });
+    const places = features.map(normalizePlace);
 
     return new Response(
       JSON.stringify({ items: places }),
