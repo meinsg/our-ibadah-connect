@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { LocationProvider } from "@/contexts/LocationContext";
+import { AuthProvider } from "@/hooks/useAuth";
 import BottomNav from "@/components/BottomNav";
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
@@ -20,6 +21,7 @@ import NotFound from "@/pages/NotFound";
 const App = () => (
   <LanguageProvider>
     <LocationProvider>
+      <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
@@ -38,6 +40,7 @@ const App = () => (
         <BottomNav />
         <Toaster />
       </BrowserRouter>
+      </AuthProvider>
     </LocationProvider>
   </LanguageProvider>
 );
