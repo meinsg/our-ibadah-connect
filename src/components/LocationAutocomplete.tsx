@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Loader2, MapPin, Search } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+
 
 interface AutocompleteResult {
   formatted: string;
