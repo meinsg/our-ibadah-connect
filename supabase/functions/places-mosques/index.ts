@@ -69,7 +69,7 @@ serve(async (req) => {
     }
 
     const params = new URLSearchParams({
-      categories: 'religion.place_of_worship',
+      categories: 'religion.place_of_worship.islam',
       conditions: 'named',
       filter: `circle:${lng},${lat},${radius}`,
       bias: `proximity:${lng},${lat}`,
