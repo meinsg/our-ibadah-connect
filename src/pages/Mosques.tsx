@@ -53,12 +53,8 @@ const Mosques = () => {
   };
 
   const handleAutocompleteSelect = async (lat: number, lon: number, city?: string, country?: string) => {
-    await setManualLocation(`${lat},${lon}`).catch(() => {});
-    // Directly update via the location context isn't possible, so we use setManualLocation
-    // with a formatted address. Let's use a workaround: call setManualLocation with the city name.
-    if (city) {
-      await setManualLocation(city + (country ? `, ${country}` : ""));
-    }
+    const address = city ? city + (country ? `, ${country}` : "") : `${lat},${lon}`;
+    await setManualLocation(address);
     setLocationMode('manual');
     setShowManualInput(false);
   };
