@@ -9,26 +9,31 @@ interface LanguageContextType {
   languageNames: Record<Language, string>;
 }
 
+const LANGUAGE_STORAGE_KEY = 'ouribadah-language';
+const DEFAULT_LANGUAGE: Language = 'en';
+
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem('ouribadah-language');
-    return (saved === 'ar' || saved === 'fr') ? saved : 'en';
-  });
+  const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
+
+  useEffect(() => {
+    const saved = typeof window !== 'undefined' ? window.localStorage.getItem(LANGUAGE_STORAGE_KEY) : null;
+    const nextLanguage: Language = saved === 'ar' || saved === 'fr' || saved === 'en' ? saved : DEFAULT_LANGUAGE;
+    setLanguageState(nextLanguage);
+  }, []);
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem('ouribadah-language', lang);
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
   }, []);
 
   const t = useCallback((key: string): string => {
-    return translations[language][key] || translations['en'][key] || key;
+    return translations[language][key] || translations.en[key] || key;
   }, [language]);
 
   const dir = language === 'ar' ? 'rtl' : 'ltr';
 
-  // Update document direction and lang
   useEffect(() => {
     document.documentElement.lang = language;
     document.documentElement.dir = dir;
