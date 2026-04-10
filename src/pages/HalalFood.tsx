@@ -4,13 +4,13 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Loader2, MapPin, Search, ArrowLeft, Navigation, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePlaces } from "@/hooks/usePlaces";
 import PlaceCard from "@/components/PlaceCard";
 import { useToast } from "@/hooks/use-toast";
 import { useSharedLocation } from "@/contexts/LocationContext";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
 
 const HalalFood = () => {
   const [radius, setRadius] = useState("5000");
