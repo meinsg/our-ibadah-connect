@@ -58,16 +58,11 @@ serve(async (req) => {
 
     // Overpass QL: find restaurants/food places tagged halal
     const query = `
-      [out:json][timeout:15];
+      [out:json][timeout:25];
       (
-        node["cuisine"~"halal",i](around:${radius},${lat},${lng});
-        way["cuisine"~"halal",i](around:${radius},${lat},${lng});
-        node["diet:halal"="yes"](around:${radius},${lat},${lng});
-        way["diet:halal"="yes"](around:${radius},${lat},${lng});
-        node["name"~"halal",i]["amenity"="restaurant"](around:${radius},${lat},${lng});
-        way["name"~"halal",i]["amenity"="restaurant"](around:${radius},${lat},${lng});
-        node["name"~"halal",i]["amenity"="fast_food"](around:${radius},${lat},${lng});
-        way["name"~"halal",i]["amenity"="fast_food"](around:${radius},${lat},${lng});
+        nwr["cuisine"~"halal",i](around:${radius},${lat},${lng});
+        nwr["diet:halal"="yes"](around:${radius},${lat},${lng});
+        nwr["name"~"halal",i]["amenity"~"restaurant|fast_food|cafe"](around:${radius},${lat},${lng});
       );
       out center body;
     `;
