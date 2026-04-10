@@ -4,13 +4,13 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Loader2, MapPin, Search, ArrowLeft, Navigation, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePlaces } from "@/hooks/usePlaces";
 import PlaceCard from "@/components/PlaceCard";
 import { useToast } from "@/hooks/use-toast";
 import { useSharedLocation } from "@/contexts/LocationContext";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
 
 const HalalFood = () => {
   const [radius, setRadius] = useState("5000");
@@ -50,6 +50,14 @@ const HalalFood = () => {
     } else {
       requestLocation();
     }
+  };
+
+  const handleAutocompleteSelect = async (lat: number, lon: number, city?: string, country?: string) => {
+    if (city) {
+      await setManualLocation(city + (country ? `, ${country}` : ""));
+    }
+    setLocationMode('manual');
+    setShowManualInput(false);
   };
 
   const handleManualLocationSubmit = async () => {
@@ -156,21 +164,12 @@ const HalalFood = () => {
           <Card className="p-4 mb-6">
             <div className="space-y-3">
               <Label htmlFor="manual-address" className="text-sm font-medium font-inter">
-                Enter your address or city
+                Search for a city or address
               </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="manual-address"
-                  placeholder="e.g., Singapore, Marina Bay"
-                  value={manualAddress}
-                  onChange={(e) => setManualAddress(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleManualLocationSubmit()}
-                  className="font-inter"
-                />
-                <Button onClick={handleManualLocationSubmit} disabled={!manualAddress.trim() || locationLoading} size="sm" className="font-inter">
-                  {locationLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                </Button>
-              </div>
+              <LocationAutocomplete
+                onSelect={handleAutocompleteSelect}
+                placeholder="e.g., Nouakchott, Mauritania"
+              />
             </div>
           </Card>
         )}
