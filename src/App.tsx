@@ -6,6 +6,7 @@ import { LocationProvider } from "@/contexts/LocationContext";
 import BottomNav from "@/components/BottomNav";
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
+import ResetPassword from "@/pages/ResetPassword";
 import Mosques from "@/pages/Mosques";
 import HalalFood from "@/pages/HalalFood";
 import Finder from "@/pages/Finder";
@@ -23,6 +24,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/finder" element={<Finder />} />
           <Route path="/mosques" element={<Mosques />} />
           <Route path="/halal-food" element={<HalalFood />} />
