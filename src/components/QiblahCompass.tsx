@@ -3,6 +3,7 @@ import { bearingToKaaba, normalize } from "../lib/qiblaMath";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Compass, Navigation, MapPin, RefreshCw } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 type Geo = { lat: number; lon: number };
 
@@ -10,6 +11,7 @@ const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent);
 const supportsDeviceOrientation = () => "DeviceOrientationEvent" in window;
 
 export default function QiblahCompass() {
+  const { t } = useLanguage();
   const [geo, setGeo] = useState<Geo | null>(null);
   const [qibla, setQibla] = useState<number | null>(null);
   const [heading, setHeading] = useState<number | null>(null);
@@ -130,7 +132,7 @@ export default function QiblahCompass() {
     <Card className="p-4 sm:p-6 shadow-prayer bg-spiritual border-accent">
       <div className="flex items-center gap-2 mb-4 sm:mb-6">
         <Compass className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-        <h2 className="text-base sm:text-lg font-semibold text-foreground font-inter">Qibla Direction</h2>
+        <h2 className="text-base sm:text-lg font-semibold text-foreground font-inter">{t('qibla.title')}</h2>
       </div>
 
       <div className="flex items-center justify-between mb-4 sm:mb-6">
@@ -138,10 +140,10 @@ export default function QiblahCompass() {
           <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
           <span className="truncate">
             {loading 
-              ? "Getting location..." 
+              ? t('prayer.gettingLocation')
               : geo 
                 ? `${geo.lat.toFixed(4)}°, ${geo.lon.toFixed(4)}°`
-                : "Location unavailable"
+                : t('qibla.locationUnavailable')
             }
           </span>
         </div>
@@ -160,7 +162,7 @@ export default function QiblahCompass() {
         <div className="text-center mb-4">
           <Button onClick={requestMotion} variant="secondary" size="sm" className="touch-manipulation">
             <Navigation className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-            Enable Compass
+            {t('qibla.enableCompass')}
           </Button>
         </div>
       )}
@@ -213,20 +215,20 @@ export default function QiblahCompass() {
             <span className="font-bold text-base sm:text-lg font-inter">
               {loading ? "..." : qibla !== null ? Math.round(qibla) : "--"}°
             </span>
-            <span className="text-xs sm:text-sm ml-2 opacity-90">from North</span>
+            <span className="text-xs sm:text-sm ml-2 opacity-90">{t('qibla.fromNorth')}</span>
           </div>
         </div>
 
         <div className="mt-3 sm:mt-4 text-center">
           <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3 font-inter px-2">
             {heading !== null 
-              ? "Point your device towards the golden arrow" 
-              : "Move your phone in a '∞' to calibrate the compass"
+              ? t('qibla.pointDevice')
+              : t('qibla.calibrate')
             }
           </p>
           {!needsMotionPerm && supportsDeviceOrientation() && (
             <div className="text-xs text-muted-foreground">
-              Device heading: {heading !== null ? Math.round(heading) : "--"}°
+              {t('qibla.deviceHeading')} {heading !== null ? Math.round(heading) : "--"}°
             </div>
           )}
         </div>
