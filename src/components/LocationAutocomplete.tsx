@@ -133,6 +133,10 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
           onFocus={() => results.length > 0 && setShowDropdown(true)}
           placeholder={placeholder}
           className="pl-9 pr-9"
+          dir="ltr"
+          lang="en"
+          autoComplete="off"
+          inputMode="text"
         />
         {loading && (
           <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
