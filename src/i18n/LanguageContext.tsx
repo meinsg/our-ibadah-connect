@@ -18,10 +18,10 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return saved && (saved === "en" || saved === "ar" || saved === "fr") ? saved : DEFAULT_LANGUAGE;
   });
 
-  const setLanguage = (lang: Language) => {
+  const setLanguage = useCallback((lang: Language) => {
     localStorage.setItem("ouribadah-lang", lang);
     setLanguageState(lang);
-  };
+  }, []);
 
   const dir = language === "ar" ? "rtl" : "ltr";
 
