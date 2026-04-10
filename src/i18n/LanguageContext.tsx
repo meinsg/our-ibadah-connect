@@ -1,44 +1,36 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Language, translations, languageNames } from "./translations";
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
-  dir: 'ltr' | 'rtl';
+  dir: "ltr" | "rtl";
   languageNames: Record<Language, string>;
 }
 
+const DEFAULT_LANGUAGE: Language = "en";
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem('ouribadah-language');
-    return (saved === 'ar' || saved === 'fr') ? saved : 'en';
-  });
+  const [language, setLanguage] = useState<Language>(DEFAULT_LANGUAGE);
 
-  const setLanguage = useCallback((lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem('ouribadah-language', lang);
-  }, []);
+  const dir = language === "ar" ? "rtl" : "ltr";
 
-  const t = useCallback((key: string): string => {
-    return translations[language][key] || translations['en'][key] || key;
-  }, [language]);
-
-  const dir = language === 'ar' ? 'rtl' : 'ltr';
-
-  // Update document direction and lang
   useEffect(() => {
     document.documentElement.lang = language;
     document.documentElement.dir = dir;
   }, [language, dir]);
 
-  return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, dir, languageNames }}>
-      {children}
-    </LanguageContext.Provider>
-  );
+  const value = useMemo<LanguageContextType>(() => ({
+    language,
+    setLanguage,
+    t: (key: string) => translations[language][key] || translations.en[key] || key,
+    dir,
+    languageNames,
+  }), [language, dir]);
+
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 };
 
 export const useLanguage = () => {

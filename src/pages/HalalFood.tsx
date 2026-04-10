@@ -7,10 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Loader2, MapPin, Search, ArrowLeft, Navigation, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useLocation } from "@/hooks/useLocation";
 import { usePlaces } from "@/hooks/usePlaces";
 import PlaceCard from "@/components/PlaceCard";
 import { useToast } from "@/hooks/use-toast";
+import { useSharedLocation } from "@/contexts/LocationContext";
 
 const HalalFood = () => {
   const [radius, setRadius] = useState("5000");
@@ -18,18 +18,18 @@ const HalalFood = () => {
   const [manualAddress, setManualAddress] = useState("");
   const [showManualInput, setShowManualInput] = useState(false);
   const [locationMode, setLocationMode] = useState<'auto' | 'manual'>('auto');
-  const { location, loading: locationLoading, error: locationError, isManualLocation, requestLocation, setManualLocation, switchToAutoLocation } = useLocation();
+  const { location, loading: locationLoading, error: locationError, requestLocation, setManualLocation, switchToAutoLocation } = useSharedLocation();
   const { places, loading: placesLoading, error: placesError, searchHalalFood } = usePlaces();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (location && !placesLoading) {
+    if (location) {
       searchHalalFood(location.latitude, location.longitude, {
         radius: parseInt(radius),
         openNow
       });
     }
-  }, [location, radius, openNow, searchHalalFood, placesLoading]);
+  }, [location, radius, openNow, searchHalalFood]);
 
   useEffect(() => {
     if (placesError) {
@@ -63,19 +63,16 @@ const HalalFood = () => {
   const handleLocationModeToggle = () => {
     const newMode = locationMode === 'auto' ? 'manual' : 'auto';
     setLocationMode(newMode);
-    
+
     if (newMode === 'auto') {
-      // Switch to automatic location
       switchToAutoLocation();
     } else {
-      // Switch to manual mode - show input
       setShowManualInput(true);
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-peaceful">
-      {/* Header */}
       <header className="bg-background/80 backdrop-blur-sm border-b border-accent safe-area-top">
         <div className="container mx-auto px-4 py-3 sm:py-4">
           <div className="flex items-center gap-3">
@@ -96,7 +93,6 @@ const HalalFood = () => {
       </header>
 
       <div className="container mx-auto px-4 py-6">
-        {/* Filters */}
         <Card className="p-4 mb-6">
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-4">
@@ -118,22 +114,14 @@ const HalalFood = () => {
               </div>
 
               <div className="flex items-center space-x-2">
-                <Switch
-                  id="open-now"
-                  checked={openNow}
-                  onCheckedChange={setOpenNow}
-                />
+                <Switch id="open-now" checked={openNow} onCheckedChange={setOpenNow} />
                 <Label htmlFor="open-now" className="text-sm font-medium font-inter">
                   Open now only
                 </Label>
               </div>
             </div>
 
-            <Button 
-              onClick={handleSearch} 
-              disabled={locationLoading || placesLoading}
-              className="w-full sm:w-auto font-inter touch-manipulation"
-            >
+            <Button onClick={handleSearch} disabled={locationLoading || placesLoading} className="w-full sm:w-auto font-inter touch-manipulation">
               {(locationLoading || placesLoading) ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : (
@@ -144,7 +132,6 @@ const HalalFood = () => {
           </div>
         </Card>
 
-        {/* Location Status */}
         {location && (
           <Card className="p-4 mb-6 border-success">
             <div className="flex items-center justify-between">
@@ -152,17 +139,11 @@ const HalalFood = () => {
                 <MapPin className="h-4 w-4" />
                 <p className="text-sm font-inter">
                   {locationMode === 'manual' ? "Manual location: " : "Auto location: "}
-                  {location.city && location.country ? `${location.city}, ${location.country}` : 
-                   `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`}
+                  {location.city && location.country ? `${location.city}, ${location.country}` : `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`}
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleLocationModeToggle}
-                  className="font-inter flex items-center gap-2"
-                >
+                <Button variant="outline" size="sm" onClick={handleLocationModeToggle} className="font-inter flex items-center gap-2">
                   <RefreshCw className="h-4 w-4" />
                   {locationMode === 'auto' ? 'Switch to Manual' : 'Switch to Auto'}
                 </Button>
@@ -183,15 +164,10 @@ const HalalFood = () => {
                   placeholder="e.g., Singapore, Marina Bay"
                   value={manualAddress}
                   onChange={(e) => setManualAddress(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleManualLocationSubmit()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleManualLocationSubmit()}
                   className="font-inter"
                 />
-                <Button 
-                  onClick={handleManualLocationSubmit}
-                  disabled={!manualAddress.trim() || locationLoading}
-                  size="sm"
-                  className="font-inter"
-                >
+                <Button onClick={handleManualLocationSubmit} disabled={!manualAddress.trim() || locationLoading} size="sm" className="font-inter">
                   {locationLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                 </Button>
               </div>
@@ -205,12 +181,7 @@ const HalalFood = () => {
               <MapPin className="h-4 w-4" />
               <p className="text-sm font-inter">{locationError}</p>
             </div>
-            <Button 
-              onClick={() => setShowManualInput(true)} 
-              variant="outline" 
-              size="sm" 
-              className="font-inter"
-            >
+            <Button onClick={() => setShowManualInput(true)} variant="outline" size="sm" className="font-inter">
               Set Location Manually
             </Button>
           </Card>
@@ -237,7 +208,6 @@ const HalalFood = () => {
           </Card>
         )}
 
-        {/* Results */}
         {places.length > 0 && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -245,7 +215,7 @@ const HalalFood = () => {
                 Found {places.length} Halal Restaurants
               </h2>
             </div>
-            
+
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {places.map((place) => (
                 <PlaceCard key={place.id} place={place} />
@@ -262,11 +232,7 @@ const HalalFood = () => {
             <p className="text-muted-foreground font-inter mb-4">
               Try increasing the search radius or removing filters
             </p>
-            <Button 
-              onClick={() => setRadius("10000")} 
-              variant="outline" 
-              className="font-inter"
-            >
+            <Button onClick={() => setRadius("10000")} variant="outline" className="font-inter">
               Expand Search to 10km
             </Button>
           </Card>
