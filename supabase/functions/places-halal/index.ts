@@ -56,16 +56,8 @@ serve(async (req) => {
       );
     }
 
-    // Overpass QL: find restaurants/food places tagged halal
-    const query = `
-      [out:json][timeout:25];
-      (
-        nwr["cuisine"~"halal",i](around:${radius},${lat},${lng});
-        nwr["diet:halal"="yes"](around:${radius},${lat},${lng});
-        nwr["name"~"halal",i]["amenity"~"restaurant|fast_food|cafe"](around:${radius},${lat},${lng});
-      );
-      out center body;
-    `;
+    // Overpass QL: find halal-tagged places
+    const query = `[out:json][timeout:25];(nwr["diet:halal"="yes"](around:${radius},${lat},${lng});nwr["cuisine"="halal"](around:${radius},${lat},${lng}););out center body qt 50;`;
 
     const response = await fetch('https://overpass-api.de/api/interpreter', {
       method: 'POST',
