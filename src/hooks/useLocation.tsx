@@ -8,14 +8,6 @@ interface LocationData {
   country?: string;
 }
 
-interface IpLocationResponse {
-  success: boolean;
-  latitude?: number;
-  longitude?: number;
-  city?: string;
-  country?: string;
-}
-
 export const useLocation = () => {
   const [location, setLocation] = useState<LocationData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,23 +46,61 @@ export const useLocation = () => {
     setError(null);
   }, [reverseGeocode]);
 
-  const fetchApproximateLocation = useCallback(async () => {
-    const response = await fetch("https://ipwho.is/");
-    if (!response.ok) {
-      throw new Error("Failed to fetch approximate location");
+  const fetchApproximateLocation = useCallback(async (): Promise<LocationData> => {
+    // Try multiple IP geolocation services as fallbacks
+    const services = [
+      {
+        url: "https://ipapi.co/json/",
+        parse: (data: Record<string, unknown>) => ({
+          latitude: data.latitude as number,
+          longitude: data.longitude as number,
+          city: data.city as string,
+          country: data.country_name as string,
+        }),
+        valid: (data: Record<string, unknown>) => typeof data.latitude === "number" && typeof data.longitude === "number",
+      },
+      {
+        url: "https://ipwho.is/",
+        parse: (data: Record<string, unknown>) => ({
+          latitude: data.latitude as number,
+          longitude: data.longitude as number,
+          city: data.city as string,
+          country: data.country as string,
+        }),
+        valid: (data: Record<string, unknown>) => data.success === true && typeof data.latitude === "number",
+      },
+      {
+        url: "https://api.bigdatacloud.net/data/client-ip-geolocation?localityLanguage=en",
+        parse: (data: Record<string, unknown>) => {
+          const loc = data.location as Record<string, unknown> | undefined;
+          return {
+            latitude: (loc?.latitude ?? data.latitude) as number,
+            longitude: (loc?.longitude ?? data.longitude) as number,
+            city: (data.city ?? data.locality) as string,
+            country: data.countryName as string,
+          };
+        },
+        valid: (data: Record<string, unknown>) => {
+          const loc = data.location as Record<string, unknown> | undefined;
+          const lat = (loc?.latitude ?? data.latitude) as number | undefined;
+          return typeof lat === "number" && !isNaN(lat);
+        },
+      },
+    ];
+
+    for (const service of services) {
+      try {
+        const response = await fetch(service.url);
+        if (!response.ok) continue;
+        const data = await response.json();
+        if (!service.valid(data)) continue;
+        return service.parse(data);
+      } catch {
+        continue;
+      }
     }
 
-    const data: IpLocationResponse = await response.json();
-    if (!data.success || typeof data.latitude !== "number" || typeof data.longitude !== "number") {
-      throw new Error("Approximate location unavailable");
-    }
-
-    return {
-      latitude: data.latitude,
-      longitude: data.longitude,
-      city: data.city,
-      country: data.country,
-    } satisfies LocationData;
+    throw new Error("Approximate location unavailable");
   }, []);
 
   const useApproximateLocation = useCallback(async (showToast = false) => {
