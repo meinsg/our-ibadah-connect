@@ -52,6 +52,14 @@ const HalalFood = () => {
     }
   };
 
+  const handleAutocompleteSelect = async (lat: number, lon: number, city?: string, country?: string) => {
+    if (city) {
+      await setManualLocation(city + (country ? `, ${country}` : ""));
+    }
+    setLocationMode('manual');
+    setShowManualInput(false);
+  };
+
   const handleManualLocationSubmit = async () => {
     if (manualAddress.trim()) {
       await setManualLocation(manualAddress.trim());
