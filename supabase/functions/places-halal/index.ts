@@ -1,49 +1,29 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { corsHeaders } from '../_shared/cors.ts'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+interface OverpassElement {
+  id: number;
+  lat?: number;
+  lon?: number;
+  center?: { lat: number; lon: number };
+  tags?: Record<string, string>;
 }
 
-interface PlaceResult {
-  place_id: string;
-  name: string;
-  vicinity?: string;
-  formatted_address?: string;
-  geometry: {
-    location: {
-      lat: number;
-      lng: number;
-    };
-  };
-  rating?: number;
-  user_ratings_total?: number;
-  opening_hours?: {
-    open_now: boolean;
-  };
-  types?: string[];
-  photos?: Array<{
-    photo_reference: string;
-  }>;
-}
-
-interface GooglePlacesResponse {
-  status: string;
-  results: PlaceResult[];
-}
-
-function normalizePlace(place: PlaceResult) {
+function normalizePlace(el: OverpassElement) {
+  const lat = el.lat ?? el.center?.lat ?? 0;
+  const lon = el.lon ?? el.center?.lon ?? 0;
+  const tags = el.tags || {};
   return {
-    id: place.place_id,
-    name: place.name,
-    address: place.vicinity || place.formatted_address,
-    lat: place.geometry?.location?.lat,
-    lng: place.geometry?.location?.lng,
-    rating: place.rating,
-    user_ratings_total: place.user_ratings_total,
-    open_now: place.opening_hours?.open_now || null,
-    types: place.types || [],
-    photo_ref: place.photos?.[0]?.photo_reference || null
+    id: `osm-${el.id}`,
+    name: tags.name || tags['name:en'] || tags['name:ar'] || 'Halal Restaurant',
+    address: [tags['addr:street'], tags['addr:city'], tags['addr:country']].filter(Boolean).join(', ') || tags.address || '',
+    lat,
+    lng: lon,
+    rating: null,
+    user_ratings_total: null,
+    open_now: null,
+    types: ['restaurant', 'halal'],
+    photo_ref: null,
   };
 }
 
@@ -53,111 +33,77 @@ serve(async (req) => {
   }
 
   try {
-    let lat, lng, radius, openNow;
+    let lat: string | null = null;
+    let lng: string | null = null;
+    let radius = '5000';
 
     if (req.method === 'GET') {
       const url = new URL(req.url);
       lat = url.searchParams.get('lat');
       lng = url.searchParams.get('lng');
       radius = url.searchParams.get('radius') || '5000';
-      openNow = url.searchParams.get('open_now') === 'true';
     } else if (req.method === 'POST') {
       const body = await req.json();
-      lat = body.lat?.toString();
-      lng = body.lng?.toString();
+      lat = body.lat?.toString() ?? null;
+      lng = body.lng?.toString() ?? null;
       radius = (body.radius || 5000).toString();
-      openNow = body.open_now === true;
     }
 
     if (!lat || !lng) {
       return new Response(
         JSON.stringify({ error: 'lat and lng parameters are required' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const API_KEY = Deno.env.get('GOOGLE_MAPS_API_KEY');
-    if (!API_KEY) {
-      console.error('Google Maps API key not found in environment variables');
-      return new Response(
-        JSON.stringify({ error: 'Google Maps API key not configured' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
+    // Overpass QL: find restaurants/food places tagged halal
+    const query = `
+      [out:json][timeout:15];
+      (
+        node["cuisine"~"halal",i](around:${radius},${lat},${lng});
+        way["cuisine"~"halal",i](around:${radius},${lat},${lng});
+        node["diet:halal"="yes"](around:${radius},${lat},${lng});
+        way["diet:halal"="yes"](around:${radius},${lat},${lng});
+        node["name"~"halal",i]["amenity"="restaurant"](around:${radius},${lat},${lng});
+        way["name"~"halal",i]["amenity"="restaurant"](around:${radius},${lat},${lng});
+        node["name"~"halal",i]["amenity"="fast_food"](around:${radius},${lat},${lng});
+        way["name"~"halal",i]["amenity"="fast_food"](around:${radius},${lat},${lng});
       );
-    }
-    
-    console.log('Making request to Google Places API with params:', { lat, lng, radius, keyword: 'halal' });
-    console.log('API_KEY present:', !!API_KEY);
-    console.log('API_KEY length:', API_KEY?.length);
+      out center body;
+    `;
 
-    const params = new URLSearchParams({
-      key: API_KEY,
-      location: `${lat},${lng}`,
-      radius: radius,
-      keyword: 'halal',
-      type: 'restaurant',
-      ...(openNow && { opennow: 'true' })
+    const response = await fetch('https://overpass-api.de/api/interpreter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `data=${encodeURIComponent(query)}`,
     });
 
-    const googleMapsUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?${params}`;
-    console.log('Google Maps URL (without API key):', googleMapsUrl.replace(API_KEY, '[REDACTED]'));
-    
-    const response = await fetch(googleMapsUrl);
-    console.log('Response status:', response.status);
-    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-    
-    const data: GooglePlacesResponse = await response.json();
-    console.log('Google Places API response:', JSON.stringify(data, null, 2));
-
-    if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
-      console.error('Google Places API error:', data.status, data.error_message);
-      
-      // Provide specific error messages for common issues
-      let errorMessage = `Google Places API error: ${data.status}`;
-      if (data.error_message) {
-        errorMessage += ` - ${data.error_message}`;
-      }
-      
-      if (data.status === 'REQUEST_DENIED') {
-        errorMessage += '. This usually indicates an invalid API key, billing not enabled, or API restrictions. Please check your Google Cloud Console settings.';
-      } else if (data.status === 'OVER_QUERY_LIMIT') {
-        errorMessage += '. You have exceeded your daily quota or rate limit.';
-      } else if (data.status === 'INVALID_REQUEST') {
-        errorMessage += '. The request is invalid, usually due to missing required parameters.';
-      }
-      
-      throw new Error(errorMessage);
+    if (!response.ok) {
+      throw new Error(`Overpass API error: ${response.status}`);
     }
 
-    const places = (data.results || []).map(normalizePlace);
-    
-    // Filter out places with non-halal indicators
-    const badKeywords = /(pork|wine|barbecue.*pork|non-halal|bacon|ham)/i;
-    const filtered = places.filter(place => {
-      const searchText = `${place.name} ${(place.types || []).join(', ')}`;
-      return !badKeywords.test(searchText);
+    const data = await response.json();
+    const elements: OverpassElement[] = data.elements || [];
+
+    const seen = new Set<number>();
+    const unique = elements.filter(el => {
+      if (seen.has(el.id)) return false;
+      seen.add(el.id);
+      return true;
     });
+
+    const places = unique.map(normalizePlace).filter(p => p.lat !== 0 && p.lng !== 0);
 
     return new Response(
-      JSON.stringify({ items: filtered }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      JSON.stringify({ items: places }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 })
