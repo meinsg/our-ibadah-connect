@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "@/hooks/useLocation";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const PrayerTimes = () => {
+  const { t } = useLanguage();
   const [currentTime, setCurrentTime] = useState(new Date());
   const { location, loading: locationLoading, refetch: refetchLocation } = useLocation();
   const { prayerTimes, loading: prayerLoading, nextPrayer, timeToNext, refetch: refetchPrayer } = usePrayerTimes(
@@ -35,17 +37,17 @@ const PrayerTimes = () => {
   };
 
   const locationText = locationLoading 
-    ? "Getting location..." 
+    ? t('prayer.gettingLocation')
     : location 
       ? `${location.city || 'Unknown City'}, ${location.country || 'Unknown Country'}`
-      : "Location unavailable";
+      : t('prayer.locationUnavailable');
 
   return (
     <Card className="p-4 sm:p-6 shadow-prayer bg-spiritual border-accent">
       <div className="flex items-center justify-between mb-4 sm:mb-6">
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-          <h2 className="text-base sm:text-lg font-semibold text-foreground font-inter">Prayer Times</h2>
+          <h2 className="text-base sm:text-lg font-semibold text-foreground font-inter">{t('prayer.title')}</h2>
         </div>
         <div className="flex items-center gap-1 sm:gap-2">
           <div className="text-xs sm:text-sm text-muted-foreground">
@@ -91,7 +93,7 @@ const PrayerTimes = () => {
       {nextPrayer && timeToNext && (
         <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-gold/10 border border-gold/20 rounded-lg">
           <p className="text-center text-xs sm:text-sm text-gold-foreground font-inter">
-            Next prayer: <span className="font-semibold">{nextPrayer}</span> in {timeToNext}
+            {t('prayer.next')} <span className="font-semibold">{nextPrayer}</span> {t('prayer.in')} {timeToNext}
           </p>
         </div>
       )}
