@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Loader2, MapPin, Search, ArrowLeft, Navigation, RefreshCw } from "lucide-react";
+import { Loader2, MapPin, Search, ArrowLeft, Navigation, RefreshCw, Info, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePlaces } from "@/hooks/usePlaces";
 import PlaceCard from "@/components/PlaceCard";
@@ -19,7 +20,7 @@ const HalalFood = () => {
   const [showManualInput, setShowManualInput] = useState(false);
   const [locationMode, setLocationMode] = useState<'auto' | 'manual'>('auto');
   const { location, loading: locationLoading, error: locationError, requestLocation, setManualLocation, switchToAutoLocation } = useSharedLocation();
-  const { places, loading: placesLoading, error: placesError, searchHalalFood } = usePlaces();
+  const { places, generalPlaces, loading: placesLoading, error: placesError, isMuslimRegion, searchHalalFood } = usePlaces();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -207,11 +208,22 @@ const HalalFood = () => {
           </Card>
         )}
 
+        {/* Muslim-majority region notice */}
+        {isMuslimRegion && places.length > 0 && (
+          <Alert className="mb-4 border-primary/20 bg-primary/5">
+            <Info className="h-4 w-4 text-primary" />
+            <AlertDescription className="text-sm font-inter">
+              In this region, Halal is the standard. We are showing all local restaurants. 
+              Please verify specific dietary requirements (like hand-slaughtered or cross-contamination) directly with the establishment.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {places.length > 0 && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground font-amiri">
-                Found {places.length} Halal Restaurants
+                {isMuslimRegion ? `Found ${places.length} Restaurants` : `Found ${places.length} Halal Restaurants`}
               </h2>
             </div>
 
@@ -223,10 +235,32 @@ const HalalFood = () => {
           </div>
         )}
 
-        {!placesLoading && places.length === 0 && location && (
+        {/* General restaurants fallback (non-Muslim regions, no halal results) */}
+        {generalPlaces.length > 0 && (
+          <div className="space-y-4 mt-6">
+            <Alert className="border-amber-400/30 bg-amber-50">
+              <AlertTriangle className="h-4 w-4 text-amber-600" />
+              <AlertDescription className="text-sm font-inter text-amber-800">
+                No certified Halal restaurants found nearby. Below are general restaurants — Halal status is unverified. Please call to confirm.
+              </AlertDescription>
+            </Alert>
+
+            <h2 className="text-lg font-semibold text-foreground font-amiri">
+              General Restaurants ({generalPlaces.length})
+            </h2>
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {generalPlaces.map((place) => (
+                <PlaceCard key={place.id} place={place} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!placesLoading && places.length === 0 && generalPlaces.length === 0 && location && (
           <Card className="p-8 text-center">
             <h3 className="text-lg font-semibold text-foreground mb-2 font-amiri">
-              No Halal Restaurants Found
+              No Restaurants Found
             </h3>
             <p className="text-muted-foreground font-inter mb-4">
               Try increasing the search radius or removing filters
