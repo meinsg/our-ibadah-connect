@@ -49,12 +49,6 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("geocode-autocomplete", {
-        body: null,
-        headers: { "Content-Type": "application/json" },
-      });
-
-      // Use query params via direct fetch since invoke doesn't support query params well
       const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
       const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
       const url = `https://${projectId}.supabase.co/functions/v1/geocode-autocomplete?text=${encodeURIComponent(text)}&type=autocomplete`;
