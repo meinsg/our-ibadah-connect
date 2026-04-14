@@ -30,19 +30,17 @@ const loadFromStorage = (): LocationData | null => {
 
 export const useLocation = () => {
   const cached = loadFromStorage();
-  const [location, setLocation] = useState<LocationData | null>(cached);
+  const [location, setLocationState] = useState<LocationData | null>(cached);
   const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState<string | null>(null);
   const [isManualLocation, setIsManualLocation] = useState(false);
   const { toast } = useToast();
-  const initialFetchDone = useRef(false);
 
-  // Persist location changes to localStorage
-  const updateLocation = useCallback((data: LocationData) => {
-    setLocation(data);
-    saveToStorage(data);
-    setError(null);
-  }, []);
+  // Wrapper that also persists to localStorage
+  const setLocation = (data: LocationData | null) => {
+    setLocationState(data);
+    if (data) saveToStorage(data);
+  };
 
   const reverseGeocode = useCallback(async (latitude: number, longitude: number) => {
     try {
