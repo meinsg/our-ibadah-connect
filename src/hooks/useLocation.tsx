@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface LocationData {
@@ -8,12 +8,41 @@ interface LocationData {
   country?: string;
 }
 
+const STORAGE_KEY = "ouribadah_location";
+
+const saveToStorage = (data: LocationData) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch {}
+};
+
+const loadFromStorage = (): LocationData | null => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (typeof parsed.latitude === "number" && typeof parsed.longitude === "number") {
+      return parsed;
+    }
+  } catch {}
+  return null;
+};
+
 export const useLocation = () => {
-  const [location, setLocation] = useState<LocationData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const cached = loadFromStorage();
+  const [location, setLocation] = useState<LocationData | null>(cached);
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState<string | null>(null);
   const [isManualLocation, setIsManualLocation] = useState(false);
   const { toast } = useToast();
+  const initialFetchDone = useRef(false);
+
+  // Persist location changes to localStorage
+  const updateLocation = useCallback((data: LocationData) => {
+    setLocation(data);
+    saveToStorage(data);
+    setError(null);
+  }, []);
 
   const reverseGeocode = useCallback(async (latitude: number, longitude: number) => {
     try {
@@ -30,18 +59,16 @@ export const useLocation = () => {
 
   const setResolvedLocation = useCallback(async (latitude: number, longitude: number, fallback?: Partial<LocationData>) => {
     const geocoded = await reverseGeocode(latitude, longitude);
-    setLocation({
+    const resolved: LocationData = {
       latitude,
       longitude,
       city: geocoded.city || fallback?.city,
       country: geocoded.country || fallback?.country,
-    });
-    setError(null);
-  }, [reverseGeocode]);
+    };
+    updateLocation(resolved);
+  }, [reverseGeocode, updateLocation]);
 
   const fetchApproximateLocation = useCallback(async (): Promise<LocationData> => {
-    // Primary: Geoapify IP info (uses our configured API key via edge function)
-    // Fallback: free IP services
     const services = [
       {
         url: "https://api.geoapify.com/v1/ipinfo?apiKey=" + (import.meta.env.VITE_GEOAPIFY_KEY || ""),
@@ -85,7 +112,7 @@ export const useLocation = () => {
 
     for (const service of services) {
       if (!service.url || service.url.includes("apiKey=&") || service.url.endsWith("apiKey=")) {
-        continue; // skip if no key configured
+        continue;
       }
       try {
         const response = await fetch(service.url);
@@ -157,12 +184,13 @@ export const useLocation = () => {
       const data = await response.json();
       if (!data?.length) throw new Error("Location not found");
       const result = data[0];
-      setLocation({
+      const resolved: LocationData = {
         latitude: parseFloat(result.lat),
         longitude: parseFloat(result.lon),
         city: result.address?.city || result.address?.town || result.address?.village,
         country: result.address?.country,
-      });
+      };
+      updateLocation(resolved);
       setIsManualLocation(true);
       toast({ title: "Location Set", description: `Set to ${result.display_name}` });
     } catch (err) {
@@ -179,7 +207,14 @@ export const useLocation = () => {
   };
 
   useEffect(() => {
-    getCurrentLocation();
+    // If we have cached data, still refresh in background but don't block UI
+    if (cached && !initialFetchDone.current) {
+      initialFetchDone.current = true;
+      // Background refresh — don't show loading since we have cached data
+      getCurrentLocation();
+    } else if (!cached) {
+      getCurrentLocation();
+    }
   }, [getCurrentLocation]);
 
   return {
