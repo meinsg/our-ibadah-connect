@@ -20,8 +20,9 @@ export const usePrayerTimes = (latitude?: number, longitude?: number) => {
       const dateStr = date.toISOString().split('T')[0];
       let times: { fajr: string; dhuhr: string; asr: string; maghrib: string; isha: string } | null = null;
 
-      // Try to use cached times if user is authenticated
-      const { data: { user } } = await supabase.auth.getUser();
+      // Only check cache for authenticated users
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user ?? null;
 
       if (user) {
         const { data: cachedTimes } = await supabase
@@ -66,7 +67,7 @@ export const usePrayerTimes = (latitude?: number, longitude?: number) => {
           isha: apiTimes.Isha
         };
 
-        // Cache for authenticated users
+        // Cache only for authenticated users
         if (user) {
           await supabase.from('prayer_times').insert({
             user_id: user.id,
