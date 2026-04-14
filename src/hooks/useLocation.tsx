@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface LocationData {
@@ -30,19 +30,17 @@ const loadFromStorage = (): LocationData | null => {
 
 export const useLocation = () => {
   const cached = loadFromStorage();
-  const [location, setLocation] = useState<LocationData | null>(cached);
+  const [location, setLocationState] = useState<LocationData | null>(cached);
   const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState<string | null>(null);
   const [isManualLocation, setIsManualLocation] = useState(false);
   const { toast } = useToast();
-  const initialFetchDone = useRef(false);
 
-  // Persist location changes to localStorage
-  const updateLocation = useCallback((data: LocationData) => {
-    setLocation(data);
-    saveToStorage(data);
-    setError(null);
-  }, []);
+  // Wrapper that also persists to localStorage
+  const setLocation = (data: LocationData | null) => {
+    setLocationState(data);
+    if (data) saveToStorage(data);
+  };
 
   const reverseGeocode = useCallback(async (latitude: number, longitude: number) => {
     try {
@@ -65,8 +63,9 @@ export const useLocation = () => {
       city: geocoded.city || fallback?.city,
       country: geocoded.country || fallback?.country,
     };
-    updateLocation(resolved);
-  }, [reverseGeocode, updateLocation]);
+    setLocation(resolved);
+    setError(null);
+  }, [reverseGeocode]);
 
   const fetchApproximateLocation = useCallback(async (): Promise<LocationData> => {
     const services = [
@@ -190,7 +189,8 @@ export const useLocation = () => {
         city: result.address?.city || result.address?.town || result.address?.village,
         country: result.address?.country,
       };
-      updateLocation(resolved);
+      setLocation(resolved);
+      setError(null);
       setIsManualLocation(true);
       toast({ title: "Location Set", description: `Set to ${result.display_name}` });
     } catch (err) {
@@ -207,14 +207,7 @@ export const useLocation = () => {
   };
 
   useEffect(() => {
-    // If we have cached data, still refresh in background but don't block UI
-    if (cached && !initialFetchDone.current) {
-      initialFetchDone.current = true;
-      // Background refresh — don't show loading since we have cached data
-      getCurrentLocation();
-    } else if (!cached) {
-      getCurrentLocation();
-    }
+    getCurrentLocation();
   }, [getCurrentLocation]);
 
   return {
