@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Navigation2 } from "lucide-react";
+import { MapPin, Navigation2, LocateFixed } from "lucide-react";
 import PrayerTimes from "@/components/PrayerTimes";
 import QiblahCompass from "@/components/QiblahCompass";
 import LanguageToggle from "@/components/LanguageToggle";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useSharedLocation } from "@/contexts/LocationContext";
@@ -12,13 +13,28 @@ import logoIcon from "@/assets/logo-icon.png";
 
 const Index = () => {
   const { t } = useLanguage();
-  const { location, loading: locationLoading } = useSharedLocation();
+  const { location, loading: locationLoading, setManualLocation, switchToAutoLocation } = useSharedLocation();
+  const [showLocationSearch, setShowLocationSearch] = useState(false);
 
   const locationText = locationLoading
     ? t("prayer.gettingLocation")
     : location
       ? `${location.city || ""}${location.city && location.country ? ", " : ""}${location.country || ""}`
       : t("prayer.locationUnavailable");
+
+  const handleLocationSelect = (lat: number, lon: number, city?: string, country?: string) => {
+    // Use setManualLocation with a formatted address string
+    const address = [city, country].filter(Boolean).join(", ");
+    if (address) {
+      setManualLocation(address);
+    }
+    setShowLocationSearch(false);
+  };
+
+  const handleUseGPS = () => {
+    switchToAutoLocation();
+    setShowLocationSearch(false);
+  };
 
   return (
     <div className="has-bottom-nav min-h-screen bg-background">
@@ -31,13 +47,39 @@ const Index = () => {
               <span className="text-lg font-bold text-primary">{t("app.name")}</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-full">
+              <button
+                onClick={() => setShowLocationSearch(!showLocationSearch)}
+                className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-full hover:bg-muted/80 transition-colors"
+              >
                 <MapPin className="h-3 w-3" />
-                <span className="truncate max-w-[140px]">{locationText}</span>
-              </div>
+                <span className="truncate max-w-[140px]">
+                  {locationLoading ? "..." : locationText || t("prayer.locationUnavailable")}
+                </span>
+              </button>
               <LanguageToggle />
             </div>
           </div>
+
+          {/* Location search dropdown */}
+          {showLocationSearch && (
+            <div className="mt-3 pb-1 space-y-2">
+              <LocationAutocomplete
+                onSelect={handleLocationSelect}
+                placeholder={t("prayer.gettingLocation") === locationText ? "Search your city..." : "Change location..."}
+                className="w-full"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleUseGPS}
+                disabled={locationLoading}
+                className="w-full text-xs gap-1.5"
+              >
+                <LocateFixed className="h-3.5 w-3.5" />
+                Use GPS Location
+              </Button>
+            </div>
+          )}
         </div>
       </header>
 
@@ -52,10 +94,7 @@ const Index = () => {
 
         {/* Bento Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-          {/* Prayer Times - full width on mobile */}
           <PrayerTimes />
-
-          {/* Qibla */}
           <QiblahCompass />
         </div>
 
