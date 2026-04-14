@@ -1,4 +1,5 @@
 import React from "react";
+import InstallPrompt from "@/components/InstallPrompt";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from "@/i18n/LanguageContext";
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
         <BottomNav />
+        <InstallPrompt />
         <Toaster />
       </BrowserRouter>
       </AuthProvider>
