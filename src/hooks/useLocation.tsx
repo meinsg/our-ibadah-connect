@@ -63,8 +63,9 @@ export const useLocation = () => {
       city: geocoded.city || fallback?.city,
       country: geocoded.country || fallback?.country,
     };
-    updateLocation(resolved);
-  }, [reverseGeocode, updateLocation]);
+    setLocation(resolved);
+    setError(null);
+  }, [reverseGeocode]);
 
   const fetchApproximateLocation = useCallback(async (): Promise<LocationData> => {
     const services = [
