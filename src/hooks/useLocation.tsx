@@ -189,7 +189,8 @@ export const useLocation = () => {
         city: result.address?.city || result.address?.town || result.address?.village,
         country: result.address?.country,
       };
-      updateLocation(resolved);
+      setLocation(resolved);
+      setError(null);
       setIsManualLocation(true);
       toast({ title: "Location Set", description: `Set to ${result.display_name}` });
     } catch (err) {
@@ -206,14 +207,7 @@ export const useLocation = () => {
   };
 
   useEffect(() => {
-    // If we have cached data, still refresh in background but don't block UI
-    if (cached && !initialFetchDone.current) {
-      initialFetchDone.current = true;
-      // Background refresh — don't show loading since we have cached data
-      getCurrentLocation();
-    } else if (!cached) {
-      getCurrentLocation();
-    }
+    getCurrentLocation();
   }, [getCurrentLocation]);
 
   return {
