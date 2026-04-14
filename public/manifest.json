@@ -4,8 +4,8 @@
   "description": "Your daily Islamic companion – Prayer times, Qibla, Mosque finder, and more.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FDFBF7",
-  "theme_color": "#064E3B",
+  "background_color": "#ffffff",
+  "theme_color": "#059669",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -16,7 +16,8 @@
     {
       "src": "/logo-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
