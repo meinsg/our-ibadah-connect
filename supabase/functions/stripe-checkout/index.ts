@@ -1,5 +1,5 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
-import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import { createClient } from "npm:@supabase/supabase-js@2.49.1";
+import Stripe from "npm:stripe@14.21.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,7 +19,6 @@ Deno.serve(async (req) => {
     const priceId = Deno.env.get("STRIPE_PRICE_ID");
     if (!priceId) throw new Error("STRIPE_PRICE_ID not configured");
 
-    // Authenticate the user
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -49,7 +48,6 @@ Deno.serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
-    // Check if user already has a Stripe customer
     const { data: profile } = await supabase
       .from("profiles")
       .select("stripe_customer_id")
@@ -65,7 +63,6 @@ Deno.serve(async (req) => {
       });
       customerId = customer.id;
 
-      // Save customer ID using service role
       const supabaseAdmin = createClient(
         supabaseUrl,
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -76,7 +73,6 @@ Deno.serve(async (req) => {
         .eq("user_id", userId);
     }
 
-    // Parse optional success/cancel URLs
     const body = await req.json().catch(() => ({}));
     const successUrl =
       body.success_url || "https://ouribadah.com/?payment=success";
