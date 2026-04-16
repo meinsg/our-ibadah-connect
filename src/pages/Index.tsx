@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Navigation2, LocateFixed } from "lucide-react";
+import { MapPin, Navigation2, LocateFixed, Sparkles, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import PrayerTimes from "@/components/PrayerTimes";
 import QiblahCompass from "@/components/QiblahCompass";
 import LanguageToggle from "@/components/LanguageToggle";
