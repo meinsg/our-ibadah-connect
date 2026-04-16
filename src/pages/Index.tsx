@@ -17,8 +17,42 @@ import logoIcon from "@/assets/logo-icon.png";
 
 const Index = () => {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const { location, loading: locationLoading, setManualLocation, switchToAutoLocation } = useSharedLocation();
   const [showLocationSearch, setShowLocationSearch] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  const handleGoPremium = async () => {
+    if (!user) {
+      navigate("/auth?redirect=/");
+      return;
+    }
+    setCheckoutLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-checkout", {
+        body: {
+          success_url: `${window.location.origin}/?payment=success`,
+          cancel_url: `${window.location.origin}/?payment=cancelled`,
+        },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+    } catch (err: any) {
+      console.error("Checkout error:", err);
+      toast({
+        title: "Checkout failed",
+        description: err.message || "Could not start checkout. Please try again.",
+        variant: "destructive",
+      });
+      setCheckoutLoading(false);
+    }
+  };
 
   const locationText = locationLoading
     ? t("prayer.gettingLocation")
