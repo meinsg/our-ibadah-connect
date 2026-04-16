@@ -136,6 +136,41 @@ const Index = () => {
           <QiblahCompass />
         </div>
 
+        {/* Go Premium CTA */}
+        <Card className="mb-6 p-5 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-accent/5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Sparkles className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-foreground">Go Premium</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Unlock all features and support OurIbadah
+                </p>
+              </div>
+            </div>
+            <Button
+              onClick={handleGoPremium}
+              disabled={checkoutLoading}
+              className="w-full sm:w-auto gap-2"
+            >
+              {checkoutLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" />
+                  Upgrade Now
+                </>
+              )}
+            </Button>
+          </div>
+        </Card>
+
         {/* Quick Access Cards */}
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
           {t("home.quickAccess")}
