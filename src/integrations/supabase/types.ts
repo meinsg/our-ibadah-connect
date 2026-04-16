@@ -115,6 +115,7 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          is_admin: boolean
           location_city: string | null
           location_country: string | null
           notification_preferences: Json | null
@@ -130,6 +131,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_admin?: boolean
           location_city?: string | null
           location_country?: string | null
           notification_preferences?: Json | null
@@ -145,6 +147,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_admin?: boolean
           location_city?: string | null
           location_country?: string | null
           notification_preferences?: Json | null
