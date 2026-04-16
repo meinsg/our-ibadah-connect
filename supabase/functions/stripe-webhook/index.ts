@@ -1,5 +1,5 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
-import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import { createClient } from "npm:@supabase/supabase-js@2.49.1";
+import Stripe from "npm:stripe@14.21.0";
 
 Deno.serve(async (req) => {
   try {
@@ -17,7 +17,6 @@ Deno.serve(async (req) => {
       return new Response("Missing stripe-signature", { status: 400 });
     }
 
-    // Verify webhook signature
     let event: Stripe.Event;
     try {
       event = await stripe.webhooks.constructEventAsync(
@@ -30,7 +29,6 @@ Deno.serve(async (req) => {
       return new Response(`Webhook Error: ${err.message}`, { status: 400 });
     }
 
-    // Use service_role to bypass RLS
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -60,11 +58,8 @@ Deno.serve(async (req) => {
           })
           .eq("user_id", userId);
 
-        if (error) {
-          console.error("Failed to update profile on checkout:", error);
-        } else {
-          console.log(`User ${userId} upgraded to premium`);
-        }
+        if (error) console.error("Failed to update profile on checkout:", error);
+        else console.log(`User ${userId} upgraded to premium`);
         break;
       }
 
@@ -72,11 +67,7 @@ Deno.serve(async (req) => {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         const status = subscription.status;
-
-        // Map Stripe status to tier
-        const tier = ["active", "trialing"].includes(status)
-          ? "premium"
-          : "free";
+        const tier = ["active", "trialing"].includes(status) ? "premium" : "free";
 
         const { error } = await supabaseAdmin
           .from("profiles")
@@ -87,13 +78,8 @@ Deno.serve(async (req) => {
           })
           .eq("stripe_customer_id", customerId);
 
-        if (error) {
-          console.error("Failed to update on subscription.updated:", error);
-        } else {
-          console.log(
-            `Customer ${customerId} subscription updated: ${status} → ${tier}`
-          );
-        }
+        if (error) console.error("Failed to update on subscription.updated:", error);
+        else console.log(`Customer ${customerId} subscription: ${status} → ${tier}`);
         break;
       }
 
@@ -110,11 +96,8 @@ Deno.serve(async (req) => {
           })
           .eq("stripe_customer_id", customerId);
 
-        if (error) {
-          console.error("Failed to update on subscription.deleted:", error);
-        } else {
-          console.log(`Customer ${customerId} downgraded to free`);
-        }
+        if (error) console.error("Failed to update on subscription.deleted:", error);
+        else console.log(`Customer ${customerId} downgraded to free`);
         break;
       }
 
