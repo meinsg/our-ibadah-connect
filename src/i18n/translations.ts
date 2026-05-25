@@ -147,6 +147,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.tracker': 'المتتبع',
     'nav.finder': 'البحث',
     'nav.knowledge': 'المكتبة',
+    'nav.login': 'دخول',
+    'nav.logout': 'خروج',
 
     'hero.title': 'ربط العبادة والمجتمع والحياة اليومية',
     'hero.subtitle': 'رفيقك الإسلامي الشامل',
