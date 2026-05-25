@@ -34,13 +34,7 @@ const ConsentForm: React.FC<Props> = ({
   };
 
   const handleRejectOptional = () => {
-    const next: ConsentState = {
-      account_service: true,
-      analytics: false,
-      marketing: false,
-      personalization: false,
-      cookies: false,
-    };
+    const next: ConsentState = { ...DEFAULT_CONSENT, account_service: true };
     setState(next);
     onSubmit(next, "reject_optional");
   };
