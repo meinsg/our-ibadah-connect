@@ -9,6 +9,9 @@ import { User } from "@supabase/supabase-js";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2, Mail, Lock, User as UserIcon, ArrowLeft } from "lucide-react";
 import logoIcon from "@/assets/logo-icon.png";
+import ConsentForm from "@/components/ConsentForm";
+import { useConsent } from "@/hooks/useConsent";
+import { ConsentState, DEFAULT_CONSENT } from "@/lib/consent";
 
 type AuthView = "login" | "register" | "forgot" | "magic";
 
@@ -23,6 +26,8 @@ const GoogleIcon = () => (
 
 const Auth = () => {
   const [view, setView] = useState<AuthView>("login");
+  const [registerStep, setRegisterStep] = useState<"form" | "consent">("form");
+  const [pendingConsent, setPendingConsent] = useState<ConsentState>(DEFAULT_CONSENT);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -31,6 +36,7 @@ const Auth = () => {
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { save: saveConsent } = useConsent();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -47,7 +53,7 @@ const Auth = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleSignUp = async () => {
+  const handleSignUp = async (consent: ConsentState) => {
     setLoading(true);
     try {
       const { error } = await supabase.auth.signUp({
@@ -67,6 +73,8 @@ const Auth = () => {
           variant: "destructive",
         });
       } else {
+        // Persist consent locally; useConsent will sync to DB once SIGNED_IN
+        await saveConsent(consent, "signup");
         toast({ title: "Welcome to Ouribadah!", description: "Please check your email to confirm your account." });
       }
     } catch {
@@ -267,9 +275,13 @@ const Auth = () => {
         </div>
       </div>
 
-      <Button onClick={handleSignUp} disabled={loading || !email || !password || !fullName} className="w-full font-inter text-sm sm:text-base h-11 sm:h-12 touch-manipulation" size="lg">
-        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        Create Account
+      <Button
+        onClick={() => setRegisterStep("consent")}
+        disabled={loading || !email || !password || !fullName}
+        className="w-full font-inter text-sm sm:text-base h-11 sm:h-12 touch-manipulation"
+        size="lg"
+      >
+        Continue
       </Button>
 
       <div className="text-center">
@@ -283,6 +295,33 @@ const Auth = () => {
           Continue as Guest
         </Link>
       </div>
+    </div>
+  );
+
+  const renderConsentStep = () => (
+    <div className="space-y-4">
+      <button
+        type="button"
+        onClick={() => setRegisterStep("form")}
+        className="flex items-center gap-1 text-muted-foreground hover:text-foreground text-sm font-inter touch-manipulation"
+      >
+        <ArrowLeft className="h-4 w-4" /> Back
+      </button>
+      <div className="text-center">
+        <h2 className="text-xl sm:text-2xl font-semibold text-foreground font-inter">Your privacy choices</h2>
+        <p className="text-muted-foreground text-xs sm:text-sm mt-2 font-inter">
+          Please review before creating your account
+        </p>
+      </div>
+      <ConsentForm
+        initial={pendingConsent}
+        submitting={loading}
+        showHeading
+        onSubmit={(next) => {
+          setPendingConsent(next);
+          handleSignUp(next);
+        }}
+      />
     </div>
   );
 
@@ -355,7 +394,8 @@ const Auth = () => {
 
         <Card className="p-4 sm:p-6 shadow-prayer bg-spiritual border-accent">
           {view === "login" && renderLoginView()}
-          {view === "register" && renderRegisterView()}
+          {view === "register" && registerStep === "form" && renderRegisterView()}
+          {view === "register" && registerStep === "consent" && renderConsentStep()}
           {view === "forgot" && renderForgotView()}
           {view === "magic" && renderMagicLinkView()}
         </Card>

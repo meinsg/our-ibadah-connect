@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      consent_records: {
+        Row: {
+          anonymous_id: string | null
+          category: Database["public"]["Enums"]["consent_category"]
+          consent_text: string
+          consent_version: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          source: string
+          status: Database["public"]["Enums"]["consent_status"]
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          anonymous_id?: string | null
+          category: Database["public"]["Enums"]["consent_category"]
+          consent_text: string
+          consent_version: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          source?: string
+          status: Database["public"]["Enums"]["consent_status"]
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          anonymous_id?: string | null
+          category?: Database["public"]["Enums"]["consent_category"]
+          consent_text?: string
+          consent_version?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          source?: string
+          status?: Database["public"]["Enums"]["consent_status"]
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       prayer_logs: {
         Row: {
           created_at: string
@@ -170,9 +212,24 @@ export type Database = {
         Args: { lat: number; lng: number }
         Returns: string
       }
+      get_current_consents: {
+        Args: { _user_id: string }
+        Returns: {
+          category: Database["public"]["Enums"]["consent_category"]
+          consent_version: string
+          status: Database["public"]["Enums"]["consent_status"]
+          updated_at: string
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      consent_category:
+        | "account_service"
+        | "analytics"
+        | "marketing"
+        | "personalization"
+        | "cookies"
+      consent_status: "granted" | "denied" | "withdrawn"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -299,6 +356,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      consent_category: [
+        "account_service",
+        "analytics",
+        "marketing",
+        "personalization",
+        "cookies",
+      ],
+      consent_status: ["granted", "denied", "withdrawn"],
+    },
   },
 } as const

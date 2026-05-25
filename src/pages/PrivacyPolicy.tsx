@@ -1,4 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ShieldCheck } from "lucide-react";
 
 const PrivacyPolicy = () => {
   return (
@@ -18,6 +21,18 @@ const PrivacyPolicy = () => {
           </CardHeader>
           
           <CardContent className="space-y-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+              <div className="flex items-start gap-2">
+                <ShieldCheck className="h-5 w-5 text-primary mt-0.5" />
+                <p className="text-sm">
+                  Manage your data and consent choices anytime.
+                </p>
+              </div>
+              <Button asChild size="sm">
+                <Link to="/privacy-preferences">Manage privacy preferences</Link>
+              </Button>
+            </div>
+
             {/* Publisher Details */}
             <section>
               <h2 className="text-2xl font-semibold mb-4">Publisher / Organization Details</h2>

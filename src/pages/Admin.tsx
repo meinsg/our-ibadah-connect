@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { Loader2, Search, Shield, ShieldOff, Crown, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AdminUser {
   user_id: string;
@@ -25,6 +26,16 @@ interface AdminUser {
   is_admin: boolean;
   subscription_tier: "free" | "premium" | string;
   subscription_status: string;
+  created_at: string;
+}
+
+interface ConsentLogRow {
+  id: string;
+  user_id: string | null;
+  category: string;
+  status: string;
+  consent_version: string;
+  source: string;
   created_at: string;
 }
 
@@ -39,6 +50,8 @@ const Admin = () => {
   const [search, setSearch] = useState("");
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [consentLogs, setConsentLogs] = useState<ConsentLogRow[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(false);
 
   // Gate: must be logged in + is_admin
   useEffect(() => {
@@ -88,6 +101,21 @@ const Admin = () => {
   useEffect(() => {
     if (isAdmin) fetchUsers();
   }, [isAdmin, fetchUsers]);
+
+  const fetchConsentLogs = useCallback(async () => {
+    setLoadingLogs(true);
+    const { data, error } = await supabase
+      .from("consent_records")
+      .select("id, user_id, category, status, consent_version, source, created_at")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (!error) setConsentLogs((data ?? []) as ConsentLogRow[]);
+    setLoadingLogs(false);
+  }, []);
+
+  useEffect(() => {
+    if (isAdmin) fetchConsentLogs();
+  }, [isAdmin, fetchConsentLogs]);
 
   const updateUser = async (
     userId: string,
@@ -157,6 +185,13 @@ const Admin = () => {
           </div>
         </div>
 
+        <Tabs defaultValue="users" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="consent">Consent audit log</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="users" className="space-y-4">
         <Card className="p-4">
           <div className="flex gap-2">
             <div className="relative flex-1">
@@ -260,6 +295,46 @@ const Admin = () => {
           Showing {users.length} user{users.length === 1 ? "" : "s"}. Toggle premium or admin
           status with the switches.
         </p>
+          </TabsContent>
+
+          <TabsContent value="consent" className="space-y-4">
+            <Card className="overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>When</TableHead>
+                    <TableHead>User ID</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Source</TableHead>
+                    <TableHead>Version</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loadingLogs ? (
+                    <TableRow><TableCell colSpan={6} className="text-center py-8"><Loader2 className="h-5 w-5 animate-spin inline" /></TableCell></TableRow>
+                  ) : consentLogs.length === 0 ? (
+                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No consent records yet.</TableCell></TableRow>
+                  ) : (
+                    consentLogs.map((row) => (
+                      <TableRow key={row.id}>
+                        <TableCell className="text-xs whitespace-nowrap">{new Date(row.created_at).toLocaleString()}</TableCell>
+                        <TableCell className="font-mono text-xs">{row.user_id ? row.user_id.slice(0, 8) + "…" : "anon"}</TableCell>
+                        <TableCell className="capitalize">{row.category.replace("_", " ")}</TableCell>
+                        <TableCell><Badge variant={row.status === "granted" ? "default" : "outline"}>{row.status}</Badge></TableCell>
+                        <TableCell className="text-xs">{row.source}</TableCell>
+                        <TableCell className="text-xs">v{row.consent_version}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </Card>
+            <p className="text-xs text-muted-foreground text-center">
+              Immutable audit log — showing latest {consentLogs.length} records. No sensitive content stored beyond consent text version.
+            </p>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
