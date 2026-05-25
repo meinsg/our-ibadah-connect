@@ -48,7 +48,7 @@ const CookieConsentBanner = () => {
   return (
     <>
       {showBanner && (
-        <div role="dialog" aria-label="Privacy and cookie consent" className="fixed inset-x-0 bottom-0 z-[60] p-3 sm:p-4 pointer-events-none">
+        <div role="dialog" aria-label="Privacy and cookie consent" className="fixed inset-x-0 bottom-0 z-[60] p-3 sm:p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:pb-[calc(5rem+env(safe-area-inset-bottom))] pointer-events-none">
           <div className="max-w-3xl mx-auto bg-card border border-border shadow-2xl rounded-2xl p-4 sm:p-5 pointer-events-auto">
             <div className="flex items-start gap-3">
               <Cookie className="h-5 w-5 text-primary mt-0.5 shrink-0" />
