@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,14 +99,17 @@ const KnowledgeHub = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [readingArticle, setReadingArticle] = useState<Article | null>(null);
 
-  const filtered = articles.filter((a) => {
-    const matchesSearch =
-      !search ||
-      a.title.toLowerCase().includes(search.toLowerCase()) ||
-      a.excerpt.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = !activeCategory || a.category === activeCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    return articles.filter((a) => {
+      const matchesSearch =
+        !q ||
+        a.title.toLowerCase().includes(q) ||
+        a.excerpt.toLowerCase().includes(q);
+      const matchesCategory = !activeCategory || a.category === activeCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [search, activeCategory]);
 
   // Reading mode
   if (readingArticle) {
@@ -186,7 +189,7 @@ const KnowledgeHub = () => {
               variant={activeCategory === cat ? "default" : "outline"}
               size="sm"
               onClick={() => setActiveCategory(cat)}
-              className="text-xs shrink-0 rounded-full"
+              className="text-xs shrink-0 rounded-full min-h-[36px]"
             >
               {cat ? categoryLabels[cat] : t("knowledge.all")}
             </Button>
