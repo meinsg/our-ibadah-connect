@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -125,4 +126,4 @@ const PlaceCard = ({ place, className = "" }: PlaceCardProps) => {
   );
 };
 
-export default PlaceCard;
+export default memo(PlaceCard);
