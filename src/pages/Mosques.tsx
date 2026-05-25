@@ -8,6 +8,7 @@ import { Loader2, MapPin, Search, ArrowLeft, Navigation, RefreshCw } from "lucid
 import { Link } from "react-router-dom";
 import { usePlaces } from "@/hooks/usePlaces";
 import PlaceCard from "@/components/PlaceCard";
+import { PlaceCardSkeletonGrid } from "@/components/PlaceCardSkeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useSharedLocation } from "@/contexts/LocationContext";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
@@ -141,20 +142,18 @@ const Mosques = () => {
 
         {location && (
           <Card className="p-4 mb-6 border-success">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-success">
-                <MapPin className="h-4 w-4" />
-                <p className="text-sm font-inter">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-start gap-2 text-success min-w-0">
+                <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
+                <p className="text-sm font-inter break-words">
                   {locationMode === 'manual' ? "Manual location: " : "Auto location: "}
                   {location.city && location.country ? `${location.city}, ${location.country}` : `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={handleLocationModeToggle} className="font-inter flex items-center gap-2">
-                  <RefreshCw className="h-4 w-4" />
-                  {locationMode === 'auto' ? 'Switch to Manual' : 'Switch to Auto'}
-                </Button>
-              </div>
+              <Button variant="outline" size="sm" onClick={handleLocationModeToggle} className="font-inter flex items-center gap-2 shrink-0 min-h-[44px] sm:min-h-0 w-full sm:w-auto justify-center">
+                <RefreshCw className="h-4 w-4" />
+                {locationMode === 'auto' ? 'Switch to Manual' : 'Switch to Auto'}
+              </Button>
             </div>
           </Card>
         )}
@@ -220,6 +219,10 @@ const Mosques = () => {
               ))}
             </div>
           </div>
+        )}
+
+        {placesLoading && places.length === 0 && location && (
+          <PlaceCardSkeletonGrid count={6} />
         )}
 
         {!placesLoading && places.length === 0 && location && (
