@@ -46,12 +46,10 @@ function loadGoogleAnalytics() {
   s.async = true;
   s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
   document.head.appendChild(s);
-  // @ts-expect-error gtag bootstrap
-  window.dataLayer = window.dataLayer || [];
-  // @ts-expect-error
-  function gtag() { window.dataLayer.push(arguments); }
-  // @ts-expect-error
-  window.gtag = gtag;
+  const w = window as unknown as { dataLayer: unknown[]; gtag: (...args: unknown[]) => void };
+  w.dataLayer = w.dataLayer || [];
+  const gtag = (...args: unknown[]) => { w.dataLayer.push(args); };
+  w.gtag = gtag;
   gtag("js", new Date());
   gtag("consent", "default", {
     analytics_storage: "granted",
@@ -61,9 +59,7 @@ function loadGoogleAnalytics() {
 }
 
 function disableGoogleAnalytics() {
-  // GA opt-out flag
-  // @ts-expect-error
-  window[`ga-disable-${GA_MEASUREMENT_ID}`] = true;
+  (window as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`] = true;
 }
 
 export const ConsentProvider = ({ children }: { children: React.ReactNode }) => {
