@@ -255,6 +255,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.tracker': 'Suivi',
     'nav.finder': 'Recherche',
     'nav.knowledge': 'Savoir',
+    'nav.login': 'Connexion',
+    'nav.logout': 'Déconnexion',
 
     'hero.title': 'Relier Culte, Communauté et Quotidien',
     'hero.subtitle': 'Votre compagnon islamique complet',
