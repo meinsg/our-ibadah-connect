@@ -82,7 +82,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 min-w-0">
               <img src={logoIcon} alt="OurIbadah" width={32} height={32} className="w-8 h-8 shrink-0" loading="eager" decoding="async" />
-              <span className="hidden xs:inline sm:inline text-lg font-bold text-primary truncate">{t("app.name")}</span>
+              <span className="text-base sm:text-lg font-bold text-primary truncate">{t("app.name")}</span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button
