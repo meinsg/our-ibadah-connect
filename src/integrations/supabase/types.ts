@@ -23,6 +23,7 @@ export type Database = {
           created_at: string
           id: string
           ip_address: string | null
+          region: string | null
           source: string
           status: Database["public"]["Enums"]["consent_status"]
           user_agent: string | null
@@ -36,6 +37,7 @@ export type Database = {
           created_at?: string
           id?: string
           ip_address?: string | null
+          region?: string | null
           source?: string
           status: Database["public"]["Enums"]["consent_status"]
           user_agent?: string | null
@@ -49,6 +51,7 @@ export type Database = {
           created_at?: string
           id?: string
           ip_address?: string | null
+          region?: string | null
           source?: string
           status?: Database["public"]["Enums"]["consent_status"]
           user_agent?: string | null

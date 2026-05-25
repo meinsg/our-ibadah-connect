@@ -8,7 +8,7 @@ import { CONSENT_TEXT, ConsentState, DEFAULT_CONSENT } from "@/lib/consent";
 import { Cookie } from "lucide-react";
 
 const CookieConsentBanner = () => {
-  const { hasDecided, loading, save, managerOpen, closeManager, state } = useConsent();
+  const { hasDecided, loading, save, managerOpen, closeManager, state, strictMode, region } = useConsent();
   const [manageOpen, setManageOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -50,16 +50,35 @@ const CookieConsentBanner = () => {
             <div className="flex items-start gap-3">
               <Cookie className="h-5 w-5 text-primary mt-0.5 shrink-0" />
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-sm sm:text-base">Your privacy matters</h3>
+                <h3 className="font-semibold text-sm sm:text-base">
+                  Your privacy matters
+                  {strictMode && (
+                    <span className="ml-2 text-[10px] uppercase tracking-wide bg-primary/10 text-primary px-1.5 py-0.5 rounded">
+                      EU / EEA / UK
+                    </span>
+                  )}
+                </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                   {CONSENT_TEXT}{" "}
                   <Link to="/privacy" className="text-primary underline">Privacy Policy</Link>
                 </p>
-                <div className="flex flex-col sm:flex-row gap-2 mt-3">
-                  <Button size="sm" onClick={acceptAll} disabled={submitting}>Accept all</Button>
-                  <Button size="sm" variant="outline" onClick={rejectOptional} disabled={submitting}>Reject optional</Button>
-                  <Button size="sm" variant="ghost" onClick={() => setManageOpen(true)} disabled={submitting}>Manage choices</Button>
-                </div>
+                {strictMode ? (
+                  <div className="flex flex-col sm:flex-row gap-2 mt-3">
+                    <Button size="sm" onClick={acceptAll} disabled={submitting}>Accept all</Button>
+                    <Button size="sm" variant="outline" onClick={rejectOptional} disabled={submitting}>Reject optional</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setManageOpen(true)} disabled={submitting}>Manage choices</Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col sm:flex-row gap-2 mt-3">
+                    <Button size="sm" onClick={acceptAll} disabled={submitting}>OK, got it</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setManageOpen(true)} disabled={submitting}>Manage choices</Button>
+                  </div>
+                )}
+                {!strictMode && (
+                  <p className="text-[10px] text-muted-foreground mt-2">
+                    Region: {region.toLowerCase()}. You can adjust every optional consent anytime in Settings.
+                  </p>
+                )}
               </div>
             </div>
           </div>
