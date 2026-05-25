@@ -232,6 +232,9 @@ export type Database = {
         | "marketing"
         | "personalization"
         | "cookies"
+        | "ad_storage"
+        | "ad_user_data"
+        | "ad_personalization"
       consent_status: "granted" | "denied" | "withdrawn"
     }
     CompositeTypes: {
@@ -366,6 +369,9 @@ export const Constants = {
         "marketing",
         "personalization",
         "cookies",
+        "ad_storage",
+        "ad_user_data",
+        "ad_personalization",
       ],
       consent_status: ["granted", "denied", "withdrawn"],
     },

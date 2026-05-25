@@ -23,6 +23,9 @@ const CookieConsentBanner = () => {
       marketing: true,
       personalization: true,
       cookies: true,
+      ad_storage: true,
+      ad_user_data: true,
+      ad_personalization: true,
     };
     await save(next, "banner");
     setSubmitting(false);

@@ -6,7 +6,10 @@ export type ConsentCategory =
   | "analytics"
   | "marketing"
   | "personalization"
-  | "cookies";
+  | "cookies"
+  | "ad_storage"
+  | "ad_user_data"
+  | "ad_personalization";
 
 export type ConsentStatus = "granted" | "denied" | "withdrawn";
 
@@ -58,6 +61,24 @@ export const CONSENT_CATEGORIES: {
     description:
       "Allows analytics scripts (like Google Analytics) to load. Essential cookies for sign-in always remain.",
   },
+  {
+    key: "ad_storage",
+    title: "Advertising cookies",
+    description:
+      "Allows advertising and remarketing cookies (e.g. Google Ads) so we can measure ad performance.",
+  },
+  {
+    key: "ad_user_data",
+    title: "Send advertising data to Google",
+    description:
+      "Allows sharing advertising-related data with Google for measurement and conversion attribution.",
+  },
+  {
+    key: "ad_personalization",
+    title: "Personalized ads",
+    description:
+      "Allows Google to use your data to show ads tailored to your interests.",
+  },
 ];
 
 export const DEFAULT_CONSENT: ConsentState = {
@@ -66,6 +87,9 @@ export const DEFAULT_CONSENT: ConsentState = {
   marketing: false,
   personalization: false,
   cookies: false,
+  ad_storage: false,
+  ad_user_data: false,
+  ad_personalization: false,
 };
 
 export function readStoredConsent(): StoredConsent | null {
