@@ -1,3 +1,10 @@
+/**
+ * DEV NOTE: Any future Google Tag Manager, Google Ads, Firebase Analytics,
+ * remarketing, or third-party marketing pixel must respect Consent Mode v2.
+ * Do not load or fire optional analytics/advertising tags unless the relevant
+ * consent signals are granted. For GTM, configure Additional consent checks
+ * for each tag before publishing.
+ */
 import React, {
   createContext,
   useCallback,
