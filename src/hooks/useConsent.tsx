@@ -17,6 +17,7 @@ import {
   readStoredConsent,
   writeStoredConsent,
 } from "@/lib/consent";
+import { detectRegion, isStrictConsentRegion, Region } from "@/lib/region";
 
 const GA_MEASUREMENT_ID = "G-W31TL68SRR";
 
@@ -24,6 +25,8 @@ interface ConsentContextValue {
   state: ConsentState;
   hasDecided: boolean;
   loading: boolean;
+  region: Region;
+  strictMode: boolean;
   save: (
     next: ConsentState,
     source?: "signup" | "banner" | "settings"
@@ -68,6 +71,11 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
   const [loading, setLoading] = useState(true);
   const [managerOpen, setManagerOpen] = useState(false);
   const syncedForUserRef = useRef<string | null>(null);
+  const [region, setRegion] = useState<Region>("UNKNOWN");
+
+  useEffect(() => {
+    setRegion(detectRegion());
+  }, []);
 
   // Bootstrap from localStorage
   useEffect(() => {
@@ -133,6 +141,7 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
       consent_version: CONSENT_VERSION,
       consent_text: CONSENT_TEXT,
       source,
+      region,
       user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
     }));
     await supabase.from("consent_records").insert(rows);
@@ -170,13 +179,15 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
       state,
       hasDecided,
       loading,
+      region,
+      strictMode: isStrictConsentRegion(region),
       save,
       withdrawAll,
       openManager: () => setManagerOpen(true),
       closeManager: () => setManagerOpen(false),
       managerOpen,
     }),
-    [state, hasDecided, loading, save, withdrawAll, managerOpen]
+    [state, hasDecided, loading, save, withdrawAll, managerOpen, region]
   );
 
   return <ConsentContext.Provider value={value}>{children}</ConsentContext.Provider>;
