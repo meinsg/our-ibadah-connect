@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { LocationProvider } from "@/contexts/LocationContext";
 import { AuthProvider } from "@/hooks/useAuth";
+import { ConsentProvider } from "@/hooks/useConsent";
+import CookieConsentBanner from "@/components/CookieConsentBanner";
 import BottomNav from "@/components/BottomNav";
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
@@ -19,11 +21,13 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
 import NotFound from "@/pages/NotFound";
 import Admin from "@/pages/Admin";
+import PrivacyPreferences from "@/pages/PrivacyPreferences";
 
 const App = () => (
   <LanguageProvider>
     <LocationProvider>
       <AuthProvider>
+      <ConsentProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
@@ -38,12 +42,15 @@ const App = () => (
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/privacy-preferences" element={<PrivacyPreferences />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <BottomNav />
         <InstallPrompt />
+        <CookieConsentBanner />
         <Toaster />
       </BrowserRouter>
+      </ConsentProvider>
       </AuthProvider>
     </LocationProvider>
   </LanguageProvider>
