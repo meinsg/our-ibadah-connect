@@ -81,7 +81,7 @@ const Index = () => {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <img src={logoIcon} alt="OurIbadah" className="w-8 h-8" />
+              <img src={logoIcon} alt="OurIbadah" width={32} height={32} className="w-8 h-8" loading="eager" decoding="async" />
               <span className="text-lg font-bold text-primary">{t("app.name")}</span>
             </div>
             <div className="flex items-center gap-2">
@@ -209,7 +209,7 @@ const Index = () => {
         {/* Footer */}
         <footer className="text-center py-6 border-t border-border">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <img src={logoIcon} alt="" className="w-5 h-5" />
+            <img src={logoIcon} alt="" width={20} height={20} className="w-5 h-5" loading="lazy" decoding="async" />
             <span className="text-sm font-semibold text-primary">{t("app.name")}</span>
           </div>
           <p className="text-xs text-muted-foreground mb-3">{t("footer.tagline")}</p>
