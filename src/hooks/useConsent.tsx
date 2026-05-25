@@ -41,27 +41,50 @@ const ConsentContext = createContext<ConsentContextValue | null>(null);
 
 let gaInjected = false;
 
+type GtagWindow = Window & {
+  dataLayer?: unknown[];
+  gtag?: (...args: unknown[]) => void;
+};
+
+function getGtag(): (...args: unknown[]) => void {
+  if (typeof window === "undefined") return () => {};
+  const w = window as GtagWindow;
+  w.dataLayer = w.dataLayer || [];
+  if (!w.gtag) {
+    w.gtag = (...args: unknown[]) => { (w.dataLayer as unknown[]).push(args); };
+  }
+  return w.gtag;
+}
+
+/**
+ * Push a Google Consent Mode v2 update reflecting the user's choices.
+ * Called on every consent save (and on bootstrap if a stored decision exists).
+ */
+function updateGoogleConsentMode(s: ConsentState) {
+  const gtag = getGtag();
+  gtag("consent", "update", {
+    analytics_storage: s.analytics && s.cookies ? "granted" : "denied",
+    ad_storage: s.ad_storage ? "granted" : "denied",
+    ad_user_data: s.ad_user_data ? "granted" : "denied",
+    ad_personalization: s.ad_personalization ? "granted" : "denied",
+  });
+}
+
 function loadGoogleAnalytics() {
   if (gaInjected) return;
   if (typeof document === "undefined") return;
   gaInjected = true;
+  const gtag = getGtag();
   const s = document.createElement("script");
   s.async = true;
   s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
   document.head.appendChild(s);
-  const w = window as unknown as { dataLayer: unknown[]; gtag: (...args: unknown[]) => void };
-  w.dataLayer = w.dataLayer || [];
-  const gtag = (...args: unknown[]) => { w.dataLayer.push(args); };
-  w.gtag = gtag;
   gtag("js", new Date());
-  gtag("consent", "default", {
-    analytics_storage: "granted",
-    ad_storage: "denied",
-  });
   gtag("config", GA_MEASUREMENT_ID, { anonymize_ip: true });
 }
 
 function disableGoogleAnalytics() {
+  if (typeof window === "undefined") return;
   (window as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`] = true;
 }
 
@@ -122,6 +145,8 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
   }, []);
 
   const applySideEffects = (s: ConsentState) => {
+    // Always push a Consent Mode v2 update so Google tags see the latest choices.
+    updateGoogleConsentMode(s);
     if (s.analytics && s.cookies) {
       loadGoogleAnalytics();
     } else {
@@ -164,13 +189,7 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
   );
 
   const withdrawAll = useCallback(async () => {
-    const next: ConsentState = {
-      account_service: true,
-      analytics: false,
-      marketing: false,
-      personalization: false,
-      cookies: false,
-    };
+    const next: ConsentState = { ...DEFAULT_CONSENT, account_service: true };
     await save(next, "settings");
   }, [save]);
 
