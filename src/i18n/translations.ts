@@ -28,6 +28,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.tracker': 'Tracker',
     'nav.finder': 'Finder',
     'nav.knowledge': 'Library',
+    'nav.login': 'Login',
+    'nav.logout': 'Logout',
 
     // Hero (kept for compatibility)
     'hero.title': 'Connecting Worship, Community, and Daily Life',
