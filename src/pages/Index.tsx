@@ -80,17 +80,17 @@ const Index = () => {
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border safe-area-top">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <img src={logoIcon} alt="OurIbadah" width={32} height={32} className="w-8 h-8" loading="eager" decoding="async" />
-              <span className="text-lg font-bold text-primary">{t("app.name")}</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <img src={logoIcon} alt="OurIbadah" width={32} height={32} className="w-8 h-8 shrink-0" loading="eager" decoding="async" />
+              <span className="hidden xs:inline sm:inline text-lg font-bold text-primary truncate">{t("app.name")}</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setShowLocationSearch(!showLocationSearch)}
                 className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-full hover:bg-muted/80 transition-colors"
               >
                 <MapPin className="h-3 w-3" />
-                <span className="truncate max-w-[140px]">
+                <span className="truncate max-w-[90px] sm:max-w-[160px]">
                   {locationLoading ? "..." : locationText || t("prayer.locationUnavailable")}
                 </span>
               </button>
