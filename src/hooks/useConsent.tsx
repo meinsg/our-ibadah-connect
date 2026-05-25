@@ -52,14 +52,11 @@ function loadGoogleAnalytics() {
   function gtag() { window.dataLayer.push(arguments); }
   // @ts-expect-error
   window.gtag = gtag;
-  // @ts-expect-error
   gtag("js", new Date());
-  // @ts-expect-error
   gtag("consent", "default", {
     analytics_storage: "granted",
     ad_storage: "denied",
   });
-  // @ts-expect-error
   gtag("config", GA_MEASUREMENT_ID, { anonymize_ip: true });
 }
 
@@ -136,7 +133,7 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
     const rows = (Object.keys(next) as ConsentCategory[]).map((cat) => ({
       user_id: userId,
       category: cat,
-      status: next[cat] ? "granted" : "denied",
+      status: (next[cat] ? "granted" : "denied") as "granted" | "denied",
       consent_version: CONSENT_VERSION,
       consent_text: CONSENT_TEXT,
       source,
