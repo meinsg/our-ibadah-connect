@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
-import { Home, CheckSquare, MapPin, BookOpen, LogOut, LogIn } from "lucide-react";
+import { Home, CheckSquare, MapPin, BookOpen, LogOut, LogIn, ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 
