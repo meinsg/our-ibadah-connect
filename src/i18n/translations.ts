@@ -28,6 +28,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.tracker': 'Tracker',
     'nav.finder': 'Finder',
     'nav.knowledge': 'Library',
+    'nav.login': 'Login',
+    'nav.logout': 'Logout',
 
     // Hero (kept for compatibility)
     'hero.title': 'Connecting Worship, Community, and Daily Life',
@@ -145,6 +147,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.tracker': 'المتتبع',
     'nav.finder': 'البحث',
     'nav.knowledge': 'المكتبة',
+    'nav.login': 'دخول',
+    'nav.logout': 'خروج',
 
     'hero.title': 'ربط العبادة والمجتمع والحياة اليومية',
     'hero.subtitle': 'رفيقك الإسلامي الشامل',
@@ -251,6 +255,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.tracker': 'Suivi',
     'nav.finder': 'Recherche',
     'nav.knowledge': 'Savoir',
+    'nav.login': 'Connexion',
+    'nav.logout': 'Déconnexion',
 
     'hero.title': 'Relier Culte, Communauté et Quotidien',
     'hero.subtitle': 'Votre compagnon islamique complet',
