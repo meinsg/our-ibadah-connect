@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import InstallPrompt from "@/components/InstallPrompt";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -9,19 +9,25 @@ import { ConsentProvider } from "@/hooks/useConsent";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
 import BottomNav from "@/components/BottomNav";
 import Index from "@/pages/Index";
-import Auth from "@/pages/Auth";
-import ResetPassword from "@/pages/ResetPassword";
-import Mosques from "@/pages/Mosques";
-import HalalFood from "@/pages/HalalFood";
-import Finder from "@/pages/Finder";
-import IbadahTracker from "@/pages/IbadahTracker";
-import KnowledgeHub from "@/pages/KnowledgeHub";
-import ContactUs from "@/pages/ContactUs";
-import PrivacyPolicy from "@/pages/PrivacyPolicy";
-import TermsOfService from "@/pages/TermsOfService";
-import NotFound from "@/pages/NotFound";
-import Admin from "@/pages/Admin";
-import PrivacyPreferences from "@/pages/PrivacyPreferences";
+const Auth = lazy(() => import("@/pages/Auth"));
+const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
+const Mosques = lazy(() => import("@/pages/Mosques"));
+const HalalFood = lazy(() => import("@/pages/HalalFood"));
+const Finder = lazy(() => import("@/pages/Finder"));
+const IbadahTracker = lazy(() => import("@/pages/IbadahTracker"));
+const KnowledgeHub = lazy(() => import("@/pages/KnowledgeHub"));
+const ContactUs = lazy(() => import("@/pages/ContactUs"));
+const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("@/pages/TermsOfService"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+const Admin = lazy(() => import("@/pages/Admin"));
+const PrivacyPreferences = lazy(() => import("@/pages/PrivacyPreferences"));
+
+const RouteFallback = () => (
+  <div className="min-h-[60vh] flex items-center justify-center text-sm text-muted-foreground">
+    Loading…
+  </div>
+);
 
 const App = () => (
   <LanguageProvider>
@@ -29,6 +35,7 @@ const App = () => (
       <AuthProvider>
       <ConsentProvider>
       <BrowserRouter>
+        <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
@@ -45,6 +52,7 @@ const App = () => (
           <Route path="/privacy-preferences" element={<PrivacyPreferences />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </Suspense>
         <BottomNav />
         <InstallPrompt />
         <CookieConsentBanner />
