@@ -71,10 +71,18 @@ function updateGoogleConsentMode(s: ConsentState) {
 }
 
 function loadGoogleAnalytics() {
-  if (gaInjected) return;
   if (typeof document === "undefined") return;
-  gaInjected = true;
   const gtag = getGtag();
+  // Ensure a previous withdrawal does not keep GA muted after re-grant.
+  if (typeof window !== "undefined") {
+    (window as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`] = false;
+  }
+  if (gaInjected) {
+    // Script already on the page — just re-issue config so subsequent events fire.
+    gtag("config", GA_MEASUREMENT_ID, { anonymize_ip: true });
+    return;
+  }
+  gaInjected = true;
   const s = document.createElement("script");
   s.async = true;
   s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
